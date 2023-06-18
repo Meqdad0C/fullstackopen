@@ -1,3 +1,6 @@
+*{
+  outline: red dashed 1px;
+}
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -39,4 +42,11 @@
 
 .read-the-docs {
   color: #888;
+}
+
+ul{
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  padding: 0;
 }
