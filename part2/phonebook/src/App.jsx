@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
-import axios from 'axios'
-import { useState,useEffect } from 'react'
-
+import { useState, useEffect } from 'react'
+import db from './modules/db'
 const Filter = ({ doFilter }) => {
   return (
     <div>
@@ -31,11 +30,18 @@ const PersonForm = (props) => {
 }
 
 const Persons = (p) => {
+  const peopleToDisplay = p.filterName === ''
+    ? p.persons
+    : p.filteredPersons
   return (<div>
-    {p.filterName === ''
-      ? p.persons.map((person) => <p key={person.id} >{person.name} {person.number}</p>)
-      : p.filteredPersons.map((person) => <p key={person.id} >{person.name} {person.number}</p>)
+    {peopleToDisplay.map((person) =>
+      <p
+        key={person.id}>
+        {person.name} {person.number}
+        <button onClick={(e) => p.handleDelete(e, person)}>delete</button>
+      </p>)
     }
+
   </div>
   )
 }
@@ -48,14 +54,8 @@ const App = () => {
   const [filterName, setFilterName] = useState('')
 
   useEffect(() => {
-    const response = axios.get('http://localhost:3001/persons')
-    
-    response.then((response)=>setPersons(response.data))
-
+    db.getAll().then((persons) => setPersons(persons))
   }, [])
-  
-
-
 
   const handleNameChange = (e) => {
     setNewName(e.target.value)
@@ -66,14 +66,37 @@ const App = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (newName === '') return
-    if (persons.find(person => newName === person.name)) {
-      alert(`${newName} is already added to phonebook`)
+    const currPerson = persons.find(person => newName === person.name)
+    if (currPerson) {
+      if (!window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        return
+      }
+      const newPerson = { ...currPerson, number: newNumber }
+      db.updatePhone(newPerson.id, newPerson).then((returnedPerson) => {
+        setPersons(persons.map(p => p.id !== returnedPerson.id ? p : returnedPerson))
+      })
+    }
+    db.addPerson({ name: newName, number: newNumber })
+      .then(newPerson => {
+        const newPersons = persons.concat(newPerson)
+        setPersons(newPersons)
+        setNewName('')
+        setNewNumber('')
+      })
+
+  }
+
+  const handleDelete = (e, person) => {
+    e.stopPropagation()
+    if (!window.confirm(`Delete ${person.name} ?`)) {
       return
     }
-    const newPersons = persons.concat({ name: newName, number: newNumber, id: persons.length + 1 })
-    setPersons(newPersons)
-    setNewName('')
-    setNewNumber('')
+    const request = db.deletePerson(person.id);
+    request.then(() => {
+      const newPersons = persons.filter((p) => p.id != person.id)
+      setPersons(newPersons)
+    }
+    )
   }
   const doFilter = (e) => {
     const fiterValue = e.target.value.toLowerCase()
@@ -84,7 +107,7 @@ const App = () => {
   }
 
 
-  return (
+  return (<>
     <div>
       <h1>Phonebook</h1>
       <Filter doFilter={doFilter} />
@@ -96,14 +119,18 @@ const App = () => {
         newName={newName}
         newNumber={newNumber}
       />
+    </div>
+    <div>
       <h2>Numbers</h2>
+
       <Persons
         filterName={filterName}
         filteredPersons={filteredPersons}
         persons={persons}
+        handleDelete={handleDelete}
       />
-
     </div>
+  </>
   )
 }
 
