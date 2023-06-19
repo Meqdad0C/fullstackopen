@@ -71,10 +71,14 @@ const App = () => {
       if (!window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         return
       }
+      console.log(currPerson);
       const newPerson = { ...currPerson, number: newNumber }
-      db.updatePhone(newPerson.id, newPerson).then((returnedPerson) => {
-        setPersons(persons.map(p => p.id !== returnedPerson.id ? p : returnedPerson))
+      console.log(newPerson);
+      db.updatePhone(currPerson.id, newPerson).then((returnedPerson) => {
+        console.log(returnedPerson);
+        setPersons(persons.map(p => p.name !== newName ? p : returnedPerson))
       })
+      return
     }
     db.addPerson({ name: newName, number: newNumber })
       .then(newPerson => {
