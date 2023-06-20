@@ -5,15 +5,16 @@ import { useEffect, useState } from "react"
 const getAllCountries = () => {
   const url = `https://studies.cs.helsinki.fi/restcountries/api/all`
   const request = axios.get(url).then(response => {
-    const countries_data = response.data.map(({ name, capital, area, flags, languages }) => ({ name: name.common, capital, area, flag: flags.svg, languages, shown: false }))
+    const countries_data = response.data.map(({ name, capital, area, flags, languages, latlng }) => ({ name: name.common, capital, area, flag: flags.svg, languages, shown: false, lat: latlng[0], lon: latlng[1] }))
     return countries_data
   })
   return request
 }
 
-const Country = ({ c, handleShow, i, show }) => {
-  console.log('iam country component ', c);
-  if (show || c.shown) {
+const Country = ({ size, c, handleShow, i, getWeather }) => {
+  if (c.shown || size === 1) {
+    if (!('temp' in c)) getWeather(c).then(result => { c.temp = result.temp; c.speed = result.speed; c.icon = result.icon })
+    console.log(c);
     return <>
       <h2>
         {c.name}
@@ -27,9 +28,17 @@ const Country = ({ c, handleShow, i, show }) => {
         {Object.values(c.languages).map((l, i) => <li key={i}>{l}</li>)}
       </ul>
       <img src={c.flag} width="300" />
+      <button onClick={(e) => { handleShow(e, i) }} >{c.shown ? 'hide' : 'show'}</button>
+      <h3>Weather in {c.name}</h3>
+      <p>
+        temprature {c.temp} Celcius<br />
+        <img src={c.icon} /><br />
+        wind {c.speed} m/s
+      </p>
+
     </>
   }
-  return <div>{c.name} <button onClick={(e) => { handleShow(e, i) }} >show</button> </div>
+  return <div>{c.name} <button onClick={(e) => { handleShow(e, i) }} >{c.shown ? 'hide' : 'show'}</button> </div>
 }
 
 const App = () => {
@@ -60,6 +69,23 @@ const App = () => {
     console.log(countries[i].shown);
   }
 
+  const getWeather = (c) => {
+    console.log(c);
+    const api_key = import.meta.env.VITE_WEATHER_KEY
+    const lon = c.lon
+    const lat = c.lat
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${api_key}`
+
+    const request = axios.get(url)
+    return request.then(response => {
+      return ({
+        temp: response.data.main.temp - 273, speed: response.data.wind.speed
+        , icon: `https://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`
+      })
+    }
+    )
+  }
+
   return (
     <>
       <h1>Find Countries <input type="search" onChange={handleChange} autoComplete="disabled" /></h1>
@@ -68,9 +94,7 @@ const App = () => {
           ? 'too many matches, specify another'
           : countries.length === 0 && searchValue !== ''
             ? 'no matches'
-            : countries.length === 1
-              ? <Country key={0} i={0} c={countries[0]} handleShow={handleShow} show={true} />
-              : countries.map((c, i) => <Country key={i} i={i} c={countries[i]} handleShow={handleShow} show={false} />)
+            : countries.map((c, i) => <Country key={i} i={i} c={c} size={countries.length} handleShow={handleShow} getWeather={getWeather} />)
       }
     </>
   )
