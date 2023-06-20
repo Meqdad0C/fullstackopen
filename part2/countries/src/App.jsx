@@ -47,11 +47,12 @@ const Country = ({ size, c, handleShow, i, getWeather }) => {
 }
 
 const App = () => {
+  const [loading,setLoading] = useState(true)
   const [searchValue, setSearchValue] = useState('')
   const [countries, setCountries] = useState([])
   const [allCountries, setAllCountries] = useState([])
   useEffect(() => {
-    getAllCountries().then(data => setAllCountries(data))
+    getAllCountries().then(data => {setAllCountries(data); setLoading(false)})
   }, [])
   const handleChange = (e) => {
     const desiredCountry = e.target.value.toLowerCase()
@@ -94,7 +95,7 @@ const App = () => {
 
   return (
     <>
-      <h1>Find Countries <input type="search" onChange={handleChange} autoComplete="disabled" /></h1>
+      <h1>Find Countries <input type="search" onChange={handleChange} autoComplete="disabled" disabled={loading?true:false} /></h1>
       {
         countries.length > 10
           ? 'too many matches, specify another'
