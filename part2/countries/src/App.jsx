@@ -12,7 +12,12 @@ const getAllCountries = () => {
 }
 
 const Country = ({ size, c, handleShow, i, getWeather }) => {
-  if (!('temp' in c)) getWeather(c).then(result => { c.temp = result.temp; c.speed = result.speed; c.icon = result.icon })
+  const [weather, setWeather] = useState(false)
+  useEffect(() => {
+    getWeather(c).then(result => { c.temp = result.temp; c.speed = result.speed; c.icon = result.icon; setWeather(true) })
+    }, [])
+  
+  if (!weather) return null
   if (c.shown || size === 1) {
     console.log(c);
     return <>
@@ -28,7 +33,7 @@ const Country = ({ size, c, handleShow, i, getWeather }) => {
         {Object.values(c.languages).map((l, i) => <li key={i}>{l}</li>)}
       </ul>
       <img src={c.flag} width="300" />
-      <button onClick={(e) => { handleShow(e, i) }} >{c.shown ? 'hide' : 'show'}</button>
+      {size===1? null:<button onClick={(e) => { handleShow(e, i) }} >{c.shown ? 'hide' : 'show'}</button>}
       <h3>Weather in {c.name}</h3>
       <p>
         temprature {c.temp} Celcius<br />
