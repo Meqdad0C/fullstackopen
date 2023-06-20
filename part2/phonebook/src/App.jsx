@@ -9,6 +9,17 @@ const Filter = ({ doFilter }) => {
   )
 }
 
+const Notification = ({ message, category }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className={category}>
+      {message}
+    </div>
+  )
+}
 const PersonForm = (props) => {
   return (
     <form onSubmit={props.handleSubmit}>
@@ -52,6 +63,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filteredPersons, setFilteredPersons] = useState([])
   const [filterName, setFilterName] = useState('')
+  const [NotifcationMessage, setNotifcationMessage] = useState(null)
+  const [errorFlag, setErrorFlag] = useState(false)
 
   useEffect(() => {
     db.getAll().then((persons) => setPersons(persons))
@@ -71,19 +84,42 @@ const App = () => {
       if (!window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         return
       }
-      console.log(currPerson);
       const newPerson = { ...currPerson, number: newNumber }
-      console.log(newPerson);
-      db.updatePhone(currPerson.id, newPerson).then((returnedPerson) => {
-        console.log(returnedPerson);
-        setPersons(persons.map(p => p.name !== newName ? p : returnedPerson))
-      })
+      db.updatePhone(currPerson.id, newPerson)
+        .then((returnedPerson) => {
+          setPersons(persons.map(p => p.name !== newName ? p : returnedPerson))
+          setNotifcationMessage(
+            `Updated ${newName}`
+          )
+          setTimeout(() => {
+            setNotifcationMessage(null)
+          }, 5000)
+        })
+        .catch(error => {
+          console.log(error);
+          setErrorFlag(true)
+          setNotifcationMessage(
+            `Information of '${newName}' has already been removed from server`
+          )
+          setTimeout(() => {
+            setNotifcationMessage(null)
+            setErrorFlag(false)
+          }, 5000)
+        })
       return
     }
+
     db.addPerson({ name: newName, number: newNumber })
       .then(newPerson => {
         const newPersons = persons.concat(newPerson)
         setPersons(newPersons)
+        setErrorFlag(false)
+        setNotifcationMessage(
+          `Added ${newName}`
+        )
+        setTimeout(() => {
+          setNotifcationMessage(null)
+        }, 5000)
         setNewName('')
         setNewNumber('')
       })
@@ -114,6 +150,7 @@ const App = () => {
   return (<>
     <div>
       <h1>Phonebook</h1>
+      <Notification category={errorFlag ? 'error' : 'success'} message={NotifcationMessage} />
       <Filter doFilter={doFilter} />
       <h2>add a new</h2>
       <PersonForm
