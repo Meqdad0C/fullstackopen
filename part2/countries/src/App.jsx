@@ -12,8 +12,8 @@ const getAllCountries = () => {
 }
 
 const Country = ({ size, c, handleShow, i, getWeather }) => {
+  if (!('temp' in c)) getWeather(c).then(result => { c.temp = result.temp; c.speed = result.speed; c.icon = result.icon })
   if (c.shown || size === 1) {
-    if (!('temp' in c)) getWeather(c).then(result => { c.temp = result.temp; c.speed = result.speed; c.icon = result.icon })
     console.log(c);
     return <>
       <h2>
@@ -78,6 +78,7 @@ const App = () => {
 
     const request = axios.get(url)
     return request.then(response => {
+      console.log(response.data);
       return ({
         temp: response.data.main.temp - 273, speed: response.data.wind.speed
         , icon: `https://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`
