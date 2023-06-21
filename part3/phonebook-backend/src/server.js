@@ -1,15 +1,21 @@
 import express from "express"
 import morgan from "morgan"
 import crypto from "crypto"
-
+import cors from "cors"
 
 
 const app = express()
 app.use(express.json())
-
+app.use(cors())
 morgan.token('body', (req) => JSON.stringify(req.body))
 app.use(morgan('dev'))
-app.use(morgan(':body'))
+app.use(
+  morgan(':body', {
+    skip: (req, res) => {
+      return !(req.method === 'PUT' || req.method === 'POST');
+    },
+  })
+);
 
 let persons = [
   {
@@ -58,7 +64,6 @@ app.delete("/api/persons/:id", (req, res) => {
   const id = Number(req.params.id)
   console.log(`Deleting use with id ${id}`)
   persons = persons.filter((p) => p.id !== id)
-  console.log(persons)
 
   res.status(204).end()
 })
@@ -79,7 +84,6 @@ app.post("/api/persons", (req, res) => {
   persons.push(newPerson)
 
   res.json(newPerson)
-  console.log(persons)
 })
 
 app.get("/info", (req, res) => {
