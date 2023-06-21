@@ -40,6 +40,8 @@ let persons = [
   },
 ]
 
+app.use(express.static('dist'))
+
 app.get("/", (req, res) => {
   res.send("<h1>Meqdad</h1>")
 })
