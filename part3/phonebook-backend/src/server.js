@@ -1,8 +1,9 @@
-import express from "express"
-import morgan from "morgan"
-import crypto from "crypto"
-import cors from "cors"
-
+import express from 'express'
+import morgan from 'morgan'
+import 'dotenv/config'
+import crypto from 'crypto'
+import cors from 'cors'
+import Person from './models/person.js'
 
 const app = express()
 app.use(express.json())
@@ -12,93 +13,92 @@ app.use(morgan('dev'))
 app.use(
   morgan(':body', {
     skip: (req, res) => {
-      return !(req.method === 'PUT' || req.method === 'POST');
+      return !(req.method === 'PUT' || req.method === 'POST')
     },
   })
-);
-
-let persons = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-]
+)
 
 app.use(express.static('dist'))
 
-app.get("/", (req, res) => {
-  res.send("<h1>Meqdad</h1>")
+app.get('/', (req, res) => {
+  res.send('<h1>Meqdad</h1>')
 })
 
-app.get("/api/persons", (req, res) => {
-  res.json(persons)
-})
-app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id)
-
-  const requestedPerson = persons.find((p) => p.id === id)
-
-  if (!requestedPerson) {
-    return res.status(404).send("<h1>User Not Found</h1>")
-  }
-
-  console.log(requestedPerson)
-  res.json(requestedPerson)
+app.get('/api/persons', (req, res) => {
+  Person.find({}).then((persons) => {
+    res.json(persons)
+  })
 })
 
-app.delete("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id)
-  console.log(`Deleting use with id ${id}`)
-  persons = persons.filter((p) => p.id !== id)
-
-  res.status(204).end()
+app.get('/api/persons/:id', (req, res, next) => {
+  Person.findById(req.params.id)
+    .then((p) => (p ? res.json(p) : res.status(404).end()))
+    .catch((error) => next(error))
 })
 
-app.post("/api/persons", (req, res) => {
+app.delete('/api/persons/:id', (req, res) => {
+  Person.findByIdAndRemove(req.params.id)
+    .then((result) => res.status(204).end())
+    .catch((error) => next(error))
+})
+
+app.post('/api/persons', (req, res) => {
   const name = req.body.name
   const number = req.body.number
 
   if (!name || !number) {
-    const missing = name ? "Number" : "Name"
+    const missing = name ? 'Number' : 'Name'
     return res.status(400).json({ error: `${missing} must be provided` })
   }
-  if (persons.find((p) => name === p.name)) {
-    return res.status(400).json({ error: "name must be unique" })
-  }
-  const id = crypto.randomUUID()
-  const newPerson = { id, name, number }
-  persons.push(newPerson)
 
-  res.json(newPerson)
+  const person_to_add = new Person({
+    name,
+    number,
+  })
+
+  person_to_add.save().then((result) => {
+    console.log(`added ${result.name} number ${result.number} to phonebook`)
+    res.json(result)
+  })
 })
 
-app.get("/info", (req, res) => {
+app.put('/api/persons/:id', (req, res, next) => {
+  const body = req.body
+
+  const person = {
+    name: body.content,
+    number: body.important,
+  }
+  /**Notice that the findByIdAndUpdate method receives a regular JavaScript object as its parameter,
+   * and not a new note object created with the Note constructor function. */
+  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then((updatedPerson) => res.json(updatedPerson))
+    .catch((error) => next(error))
+})
+
+app.get('/info', async (req, res) => {
+  const count = await Person.find({}).then((respons) => respons.length)
   res.send(
-    `<p>Phonebook has info for ${persons.length} 
-      people <br/> ${new Date().toString()}</p>`
+    `<p>Phonebook has info for ${count} people <br/> ${new Date().toString()}</p>`
   )
 })
-
 const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: "unknown endpoint" })
+  response.status(404).send({ error: 'unknown endpoint' })
 }
 
 app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
+// this has to be the last loaded middleware.
+app.use(errorHandler)
 
 export default app
