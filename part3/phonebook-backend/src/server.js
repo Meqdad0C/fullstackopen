@@ -1,7 +1,6 @@
 import express from 'express'
 import morgan from 'morgan'
 import 'dotenv/config'
-import crypto from 'crypto'
 import cors from 'cors'
 import Person from './models/person.js'
 
@@ -42,7 +41,7 @@ app.delete('/api/persons/:id', (req, res) => {
     .catch((error) => next(error))
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const name = req.body.name
   const number = req.body.number
 
@@ -56,25 +55,30 @@ app.post('/api/persons', (req, res) => {
     number,
   })
 
-  person_to_add.save().then((result) => {
-    console.log(`added ${result.name} number ${result.number} to phonebook`)
-    res.json(result)
-  })
+  person_to_add
+    .save()
+    .then((result) => {
+      console.log(`added ${result.name} number ${result.number} to phonebook`)
+      res.json(result)
+    })
+    .catch((error) => next(error))
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
-  const body = req.body
+  const id = req.params.id
+  const { name, number } = req.body
 
-  const person = {
-    name: body.name,
-    number: body.number,
-  }
-  /**Notice that the findByIdAndUpdate method receives a regular JavaScript object as its parameter,
-   * and not a new note object created with the Note constructor function. */
-  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+  const person = { name, number }
+  /** Notice that the findByIdAndUpdate method receives a regular JavaScript object as its parameter,
+   *  and not a new note object created with the Note constructor function. */
+  Person.findByIdAndUpdate(id, person, {
+    new: true,
+    runValidators: true,
+    context: 'query',
+  })
     .then((updatedPerson) => {
-      console.log(updatedPerson);
-      return res.json(updatedPerson)})
+      return res.json(updatedPerson)
+    })
     .catch((error) => next(error))
 })
 
@@ -84,23 +88,24 @@ app.get('/info', async (req, res) => {
     `<p>Phonebook has info for ${count} people <br/> ${new Date().toString()}</p>`
   )
 })
+
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
-
-app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
   }
 
   next(error)
 }
 
-// this has to be the last loaded middleware.
+app.use(unknownEndpoint)
 app.use(errorHandler)
 
 export default app

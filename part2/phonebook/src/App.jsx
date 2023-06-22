@@ -88,42 +88,35 @@ const App = () => {
       db.updatePhone(currPerson.id, newPerson)
         .then((returnedPerson) => {
           setPersons(persons.map(p => p.name !== newName ? p : returnedPerson))
-          setNotifcationMessage(
-            `Updated ${newName}`
-          )
-          setTimeout(() => {
-            setNotifcationMessage(null)
-          }, 5000)
+          handleNotifcation(`Updated ${newName}`, false)
         })
-        .catch(error => {
-          console.log(error);
-          setErrorFlag(true)
-          setNotifcationMessage(
-            `Information of '${newName}' has already been removed from server`
-          )
-          setTimeout(() => {
-            setNotifcationMessage(null)
-            setErrorFlag(false)
-          }, 5000)
-        })
-      return
+        .catch(error => errorPrinter(error))
     }
+    else {
+      db.addPerson({ name: newName, number: newNumber })
+        .then(newPerson => {
+          const newPersons = persons.concat(newPerson)
+          setPersons(newPersons)
+          handleNotifcation(`Added ${newName}`, false)
+          setNewName('')
+          setNewNumber('')
+        })
+        .catch(error => errorPrinter(error))
+    }
+  }
+  const errorPrinter = (error) => {
+    console.log(error);
+    const message = `${error.response.data.error}`
+    handleNotifcation(message, true)
+  }
 
-    db.addPerson({ name: newName, number: newNumber })
-      .then(newPerson => {
-        const newPersons = persons.concat(newPerson)
-        setPersons(newPersons)
-        setErrorFlag(false)
-        setNotifcationMessage(
-          `Added ${newName}`
-        )
-        setTimeout(() => {
-          setNotifcationMessage(null)
-        }, 5000)
-        setNewName('')
-        setNewNumber('')
-      })
-
+  const handleNotifcation = (message, error_flag) => {
+    setErrorFlag(error_flag)
+    setNotifcationMessage(message)
+    setTimeout(() => {
+      setNotifcationMessage(null)
+      if (error_flag) setErrorFlag(false)
+    }, 5000)
   }
 
   const handleDelete = (e, person) => {
