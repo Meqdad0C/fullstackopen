@@ -66,13 +66,15 @@ app.put('/api/persons/:id', (req, res, next) => {
   const body = req.body
 
   const person = {
-    name: body.content,
-    number: body.important,
+    name: body.name,
+    number: body.number,
   }
   /**Notice that the findByIdAndUpdate method receives a regular JavaScript object as its parameter,
    * and not a new note object created with the Note constructor function. */
   Person.findByIdAndUpdate(req.params.id, person, { new: true })
-    .then((updatedPerson) => res.json(updatedPerson))
+    .then((updatedPerson) => {
+      console.log(updatedPerson);
+      return res.json(updatedPerson)})
     .catch((error) => next(error))
 })
 
