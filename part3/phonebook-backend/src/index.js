@@ -1,7 +1,6 @@
-import app from "./server.js"
+const config = require('./utils/config')
+const app = require('./server')
 
-
-const PORT = process.env.PORT || 3001
-app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}!`)
+app.listen(config.PORT, () => {
+  console.log(`Server listening on port ${config.PORT}!`)
 })
