@@ -1,0 +1,12 @@
+GET {{host}}/api/blogs
+
+###
+POST {{host}}/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Six of Crows",
+  "author": "Meqdad",
+  "url": "Meqdad.com",
+  "likes": 999
+}
