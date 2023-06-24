@@ -1,7 +1,8 @@
 const express = require('express')
+require('express-async-errors')
 const database = require('./module/database')
 const cors = require('cors')
-const morgan = require("morgan");
+const morgan = require('morgan')
 const middleware = require('./utils/middleware')
 const blogRouter = require('./controller/blogs')
 

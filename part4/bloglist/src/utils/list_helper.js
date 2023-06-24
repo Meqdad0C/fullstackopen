@@ -33,6 +33,7 @@ const mostBlogs = (blogs) => {
 }
 
 const mostLikes = (blogs) => {
+  if (!blogs.length) return {}
   const groupedByAuthor = _.groupBy(blogs, 'author')
   const authorsWithLikes = _.map(groupedByAuthor, (blogs, author) => ({
     author: author,
