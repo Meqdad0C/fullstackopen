@@ -1,6 +1,10 @@
 const Blog = require('../models/blog')
 const User = require('../models/user')
-const { checkAuthHeader, throwMyCustomError } = require('../utils/middleware')
+const {
+  checkAuthHeader,
+  throwMyCustomError,
+  userExtractor,
+} = require('../utils/middleware')
 const blogRouter = require('express').Router()
 
 blogRouter.get('/', async (request, response) => {
@@ -17,12 +21,13 @@ blogRouter.get('/:id', async (request, response) => {
   }
 })
 
-blogRouter.put('/:id', checkAuthHeader, async (request, response) => {
+blogRouter.put('/:id', userExtractor, async (request, response) => {
   // ? how to make it right or what is the best practice
   const _id = request.params.id
   const blog = await Blog.findById(_id)
+  const user = request.user
 
-  if (blog.user.toString() !== request.auth.id) {
+  if (blog.user.toString() !== user.id.toString()) {
     throwMyCustomError(
       'UnauthorizedError',
       'Unauthorized to edit; not the owner'
@@ -39,30 +44,34 @@ blogRouter.put('/:id', checkAuthHeader, async (request, response) => {
   response.json(updatedBlog)
 })
 
-blogRouter.delete('/:id', checkAuthHeader, async (request, response) => {
+blogRouter.delete('/:id', userExtractor, async (request, response) => {
   // ? how to make it right or what is the best practice
-  const _id = request.params.id
-  const blog = await Blog.findById(_id)
+  const blog = await Blog.findById(request.params.id)
+  const user = request.user
 
-  if (blog.user.toString() !== request.auth.id) {
+  if (blog.user.toString() !== user.id.toString()) {
     throwMyCustomError(
       'UnauthorizedError',
       'Unauthorized to delete; not the owner'
     )
   }
-  await Blog.findByIdAndRemove(_id)
+
+  user.blogs = user.blogs.filter((b) => b.toString() !== blog.id.toString())
+
+  await user.save()
+  await blog.remove()
+
   response.status(204).end()
 })
 
-blogRouter.post('/', checkAuthHeader, async (request, response) => {
+blogRouter.post('/', userExtractor, async (request, response) => {
   const { author, url, title } = request.body
-  const { id } = request.auth
-  const user = await User.findById(id)
+  const user = request.user
   const blog = new Blog({
     author,
     url,
     title,
-    user: id,
+    user: user.id,
   })
 
   const savedBlog = await blog.save()

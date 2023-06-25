@@ -1,4 +1,5 @@
 const logger = require('./logger')
+const User = require('../models/user')
 /*const morgan = require('morgan')
 
 morgan.token('body', (req) => JSON.stringify(req.body))
@@ -17,11 +18,9 @@ const requestLogger = (request, response, next) => {
   next()
 }
 
-const checkAuthHeader = (request, response, next) => {
+const checkAuthHeader = (request) => {
   if (!request.auth) {
-    const error = new Error('Unauthorized')
-    error.name = 'UnauthorizedError'
-    next(error)
+    throwMyCustomError('UnauthorizedError', 'operation not permitted')
   }
 }
 
@@ -29,6 +28,17 @@ const throwMyCustomError = (name, message) => {
   const error = new Error(message)
   error.name = name
   throw error
+}
+
+const userExtractor = async (request, response, next) => {
+  checkAuthHeader(request)
+  const user = await User.findById(request.auth.id)
+  if (!user) {
+    throwMyCustomError('UnauthorizedError', 'operation not permitted')
+  }
+  request.user = user
+
+  next()
 }
 
 const unknownEndpoint = (request, response) => {
@@ -56,6 +66,7 @@ const errorHandler = (error, request, response, next) => {
 }
 
 module.exports = {
+  userExtractor,
   throwMyCustomError,
   checkAuthHeader,
   requestLogger,
