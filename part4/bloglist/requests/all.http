@@ -35,19 +35,19 @@ Content-Type: application/json
 ###
 POST {{host}}/api/blogs
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InBlcGJhdyIsImlkIjoiNjQ5NzgxMzQ4Yzg4Mzc5MjJjMjQ2NGVkIiwiaWF0IjoxNjg3NjUwOTA4fQ.D1pDdqcN8tOxht9EYUVlPbsDzzpjy3MsqHjXroB_3t4
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNpcmkiLCJpZCI6IjY0OTc5Y2FmYzNjMjgyNWJlOWZiMzJmZCIsImlhdCI6MTY4NzY4ODk1Mn0.TSoNBw7q5vKtnEEpShLjVsvDeXPqAxTyCkrw8b5rjdA
 
 {
-  "title": "qqqq",
-  "author": "qqqq",
-  "url": "qqq.com",
-  "userID": "649781348c8837922c2464ed"
+  "title": "wwwwww",
+  "author": "wwwwwww",
+  "url": "wwwwwwww",
+  "userID": "64979cafc3c2825be9fb32fd"
 }
 
 ###
-PUT {{host}}/api/blogs/649781478c8837922c2464f3
+PUT {{host}}/api/blogs/6498174a2b22c31b6ef20682
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InBlcGJhdyIsImlkIjoiNjQ5NzgxMzQ4Yzg4Mzc5MjJjMjQ2NGVkIiwiaWF0IjoxNjg3NjUwOTA4fQ.D1pDdqcN8tOxht9EYUVlPbsDzzpjy3MsqHjXroB_3t4
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNpcmkiLCJpZCI6IjY0OTc5Y2FmYzNjMjgyNWJlOWZiMzJmZCIsImlhdCI6MTY4NzY4ODk1Mn0.TSoNBw7q5vKtnEEpShLjVsvDeXPqAxTyCkrw8b5rjdA
 
 {
   "likes": 100,
@@ -83,6 +83,6 @@ Content-Type: application/json
 }
 
 ###
-DELETE {{host}}/api/blogs/6497a75bdf3ca7a06a9bce18
+DELETE {{host}}/api/blogs/6498433706363ce738e74b8d
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InBlcGJhdyIsImlkIjoiNjQ5NzgxMzQ4Yzg4Mzc5MjJjMjQ2NGVkIiwiaWF0IjoxNjg3NjUwOTA4fQ.D1pDdqcN8tOxht9EYUVlPbsDzzpjy3MsqHjXroB_3t4
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNpcmkiLCJpZCI6IjY0OTc5Y2FmYzNjMjgyNWJlOWZiMzJmZCIsImlhdCI6MTY4NzY4ODk1Mn0.TSoNBw7q5vKtnEEpShLjVsvDeXPqAxTyCkrw8b5rjdA

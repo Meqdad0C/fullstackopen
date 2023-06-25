@@ -8,8 +8,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="@types/jest" level="application" />
+    <orderEntry type="module" module-name="bloglist-frontend" />
     <orderEntry type="library" name="@types/lodash" level="application" />
     <orderEntry type="library" name="@types/supertest" level="application" />
+    <orderEntry type="library" name="@types/jest" level="application" />
   </component>
 </module>
