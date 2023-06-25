@@ -5,6 +5,7 @@ const api = supertest(app)
 const Blog = require('../models/blog')
 const helper = require('./test_helper')
 
+const token = process.env.TEST_TOKEN
 beforeEach(async () => {
   await Blog.deleteMany({})
   await Blog.insertMany(helper.initialBlogs)
@@ -40,10 +41,10 @@ describe('addition of a new blog', () => {
       title: 'Seven Husbands of Evelyn Hugo',
       url: 'pepaw.com',
     }
-
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -53,6 +54,22 @@ describe('addition of a new blog', () => {
     const contents = blogsAtEnd.map((r) => r.title)
     expect(contents).toContain('Seven Husbands of Evelyn Hugo')
   })
+  test('Unauthorized if a token is not provided.', async () => {
+    const newBlog = {
+      author: 'pepbaw',
+      likes: 1597,
+      title: 'Seven Husbands of Evelyn Hugo',
+      url: 'pepaw.com',
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await helper.blogsInDB()
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+  })
 
   test('blog without url is not added', async () => {
     const newBlog = {
@@ -60,7 +77,11 @@ describe('addition of a new blog', () => {
       title: 'Seven Husbands of Evelyn Hugo',
     }
 
-    await api.post('/api/blogs').send(newBlog).expect(400)
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(400)
 
     const blogsAtEnd = await helper.blogsInDB()
     expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
@@ -72,7 +93,11 @@ describe('addition of a new blog', () => {
       url: 'dodo.com',
     }
 
-    await api.post('/api/blogs').send(newBlog).expect(400)
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBlog)
+      .expect(400)
 
     const blogsAtEnd = await helper.blogsInDB()
     expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
@@ -87,6 +112,7 @@ describe('addition of a new blog', () => {
 
     const response = await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
