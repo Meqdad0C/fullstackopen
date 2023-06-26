@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog.jsx'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import './App.css'
 import Toggleable from './components/Toggleable.jsx'
+import PropTypes from 'prop-types'
 
 const LoginForm = ({ handleLogin }) => {
   const [username, setUsername] = useState('')
@@ -41,13 +42,15 @@ const LoginForm = ({ handleLogin }) => {
     </form>
   )
 }
-
-const Notification = ({ message, errorFlag }) => {
+LoginForm.propTypes = {
+  handleLogin: PropTypes.func.isRequired,
+}
+const Notification = ({ message, errorRef }) => {
   if (message === null) {
     return null
   }
 
-  return <div className={errorFlag ? 'error' : 'success'}>{message}</div>
+  return <div className={errorRef.current ? 'error' : 'success'}>{message}</div>
 }
 
 const BlogForm = ({ handleSubmit }) => {
@@ -109,12 +112,12 @@ const BlogForm = ({ handleSubmit }) => {
   )
 }
 
-const DisplayBlogs = ({ blogs }) => {
+const DisplayBlogs = ({ blogs, setBlogs }) => {
   return (
     <div>
       <h2>blogs</h2>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} setBlogs={setBlogs} />
       ))}
     </div>
   )
@@ -124,10 +127,14 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [notificationMessage, setNotificationMessage] = useState(null)
-  const [errorFlag, setErrorFlag] = useState(false)
+  let errorRef = useRef(false)
+  const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
+    blogService.getAll().then((blogs) => {
+      blogs.sort((a, b) => b.likes - a.likes)
+      setBlogs(blogs)
+    })
   }, [])
 
   useEffect(() => {
@@ -140,19 +147,25 @@ const App = () => {
   }, [])
 
   const handleNotification = (message, error_flag) => {
-    if (error_flag) setErrorFlag(error_flag)
+    if (error_flag) errorRef.current = true
     setNotificationMessage(message)
     setTimeout(() => {
       setNotificationMessage(null)
-      if (error_flag) setErrorFlag(false)
+      if (error_flag) errorRef.current = false
     }, 5000)
   }
 
   const handleSubmit = async (blogObject) => {
     try {
+      blogFormRef.current.toggleVisibility()
       const returnedBlog = await blogService.create(blogObject)
+      returnedBlog.user = {
+        id: returnedBlog.user,
+        username: user.username,
+        name: user.name,
+      }
       setBlogs(blogs.concat(returnedBlog))
-      handleNotification('Blog added successfully!')
+      handleNotification('Blog added successfully!', false)
     } catch (exception) {
       handleNotification('Fill missing fields!', true)
     }
@@ -178,12 +191,10 @@ const App = () => {
   return (
     <>
       <h1>Blog List</h1>
-      <Notification message={notificationMessage} errorFlag={errorFlag} />
+      <Notification message={notificationMessage} errorRef={errorRef} />
       {user === null ? (
         <Toggleable buttonLabel="login">
-          <LoginForm
-            handleLogin={handleLogin}
-          />
+          <LoginForm handleLogin={handleLogin} />
         </Toggleable>
       ) : (
         <main>
@@ -192,7 +203,7 @@ const App = () => {
             <button onClick={handleLogout}>logout</button>
           </div>
           {
-            <Toggleable buttonLabel="new blog">
+            <Toggleable buttonLabel="new blog" ref={blogFormRef}>
               <BlogForm
                 handleSubmit={handleSubmit}
                 handleNotification={handleNotification}
@@ -201,7 +212,7 @@ const App = () => {
           }
         </main>
       )}
-      <DisplayBlogs blogs={blogs} />
+      <DisplayBlogs blogs={blogs} setBlogs={setBlogs} />
     </>
   )
 }

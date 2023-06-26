@@ -21,10 +21,10 @@ blogRouter.get('/:id', async (request, response) => {
   }
 })
 
-blogRouter.put('/:id', userExtractor, async (request, response) => {
+blogRouter.put('/:id', async (request, response) => {
   // ? how to make it right or what is the best practice
   const _id = request.params.id
-  const blog = await Blog.findById(_id)
+/*  const blog = await Blog.findById(_id)
   const user = request.user
 
   if (blog.user.toString() !== user.id.toString()) {
@@ -32,7 +32,7 @@ blogRouter.put('/:id', userExtractor, async (request, response) => {
       'UnauthorizedError',
       'Unauthorized to edit; not the owner'
     )
-  }
+  }*/
 
   const updatedFields = request.body
   const updatedBlog = await Blog.findByIdAndUpdate(_id, updatedFields, {
