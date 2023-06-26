@@ -7,5 +7,9 @@
 			"path": "../part4/bloglist"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"jest.disabledWorkspaceFolders": [
+			"bloglist-frontend"
+		]
+	}
 }
