@@ -3,34 +3,23 @@ import Blog from './components/Blog.jsx'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import './App.css'
+import Toggleable from './components/Toggleable.jsx'
 
-const LoginForm = ({ setUser, handleNotification }) => {
+const LoginForm = ({ handleLogin }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  const handleLogin = async (event) => {
+  const submitCredentials = async (event) => {
     event.preventDefault()
-
-    try {
-      const user = await loginService.login({
-        username,
-        password,
-      })
-
-      window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
-      blogService.setToken(user.token)
-      setUser(user)
-      setUsername('')
-      setPassword('')
-    } catch (exception) {
-      handleNotification('Wrong credentials', true)
-    }
+    handleLogin({ username, password })
+    setUsername('')
+    setPassword('')
   }
 
   return (
-    <form onSubmit={handleLogin}>
+    <form onSubmit={submitCredentials}>
       <div>
-        username
+        username{' '}
         <input
           type="text"
           value={username}
@@ -40,7 +29,7 @@ const LoginForm = ({ setUser, handleNotification }) => {
         />
       </div>
       <div>
-        password
+        password{' '}
         <input
           type="password"
           value={password}
@@ -60,25 +49,20 @@ const Notification = ({ message, errorFlag }) => {
 
   return <div className={errorFlag ? 'error' : 'success'}>{message}</div>
 }
-const BlogForm = ({ setBlogs, blogs, handleNotification }) => {
+
+const BlogForm = ({ handleSubmit }) => {
   const [newBlogTitle, setNewBlogTitle] = useState('')
   const [newBlogAuthor, setNewBlogAuthor] = useState('')
   const [newBlogUrl, setNewBlogUrl] = useState('')
 
-  const handleBlogSubmit = async (event) => {
+  const submitNewBlog = async (event) => {
     event.preventDefault()
     const blogObject = {
       title: newBlogTitle,
       author: newBlogAuthor,
       url: newBlogUrl,
     }
-    try {
-      const returnedBlog = await blogService.create(blogObject)
-      setBlogs(blogs.concat(returnedBlog))
-      handleNotification('Blog added successfully!')
-    } catch (exception) {
-      handleNotification('Fill missing fields!', true)
-    }
+    handleSubmit(blogObject)
 
     setNewBlogTitle('')
     setNewBlogAuthor('')
@@ -88,7 +72,7 @@ const BlogForm = ({ setBlogs, blogs, handleNotification }) => {
   return (
     <>
       <h2>blog form</h2>
-      <form onSubmit={handleBlogSubmit}>
+      <form onSubmit={submitNewBlog}>
         <div>
           title:
           <input
@@ -142,15 +126,6 @@ const App = () => {
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [errorFlag, setErrorFlag] = useState(false)
 
-  const handleNotification = (message, error_flag) => {
-    if (error_flag) setErrorFlag(error_flag)
-    setNotificationMessage(message)
-    setTimeout(() => {
-      setNotificationMessage(null)
-      if (error_flag) setErrorFlag(false)
-    }, 5000)
-  }
-
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
   }, [])
@@ -164,6 +139,37 @@ const App = () => {
     }
   }, [])
 
+  const handleNotification = (message, error_flag) => {
+    if (error_flag) setErrorFlag(error_flag)
+    setNotificationMessage(message)
+    setTimeout(() => {
+      setNotificationMessage(null)
+      if (error_flag) setErrorFlag(false)
+    }, 5000)
+  }
+
+  const handleSubmit = async (blogObject) => {
+    try {
+      const returnedBlog = await blogService.create(blogObject)
+      setBlogs(blogs.concat(returnedBlog))
+      handleNotification('Blog added successfully!')
+    } catch (exception) {
+      handleNotification('Fill missing fields!', true)
+    }
+  }
+
+  const handleLogin = async (userObject) => {
+    try {
+      const user = await loginService.login(userObject)
+
+      window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
+      blogService.setToken(user.token)
+      setUser(user)
+    } catch (exception) {
+      handleNotification('Wrong credentials', true)
+    }
+  }
+
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogAppUser')
     setUser(null)
@@ -171,27 +177,31 @@ const App = () => {
 
   return (
     <>
-      <h1>Blogs List</h1>
+      <h1>Blog List</h1>
       <Notification message={notificationMessage} errorFlag={errorFlag} />
       {user === null ? (
-        <LoginForm setUser={setUser} handleNotification={handleNotification} />
+        <Toggleable buttonLabel="login">
+          <LoginForm
+            handleLogin={handleLogin}
+          />
+        </Toggleable>
       ) : (
         <main>
           <div>
             <p>{user.name} logged in</p>{' '}
             <button onClick={handleLogout}>logout</button>
           </div>
-          <DisplayBlogs blogs={blogs} />
           {
-            <BlogForm
-              blogs={blogs}
-              setBlogs={setBlogs}
-              setErrorMessage={setNotificationMessage}
-              handleNotification={handleNotification}
-            />
+            <Toggleable buttonLabel="new blog">
+              <BlogForm
+                handleSubmit={handleSubmit}
+                handleNotification={handleNotification}
+              />
+            </Toggleable>
           }
         </main>
       )}
+      <DisplayBlogs blogs={blogs} />
     </>
   )
 }
