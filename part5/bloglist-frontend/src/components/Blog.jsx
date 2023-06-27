@@ -29,20 +29,27 @@ const Blog = ({ blog, handlers }) => {
   return (
     <div style={blogStyle} className="blog">
       <div>
-        {blog.title} - {blog.author}
+        <div>
+          {blog.title} - {blog.author}
+        </div>
+        <button onClick={() => setVisible(!visible)}>
+          {visible ? 'hide' : 'view'}
+        </button>
       </div>
-      <button onClick={() => setVisible(!visible)}>
-        {visible ? 'hide' : 'view'}
-      </button>
-      <div style={{ display: visible ? '' : 'none' }}>
-        {blog.url} <br />
-        {blog.likes} likes <button onClick={handleLike}>like</button>
-        <p>added by: {blog.user.name}</p>
-        {currentUser && blog.user.username === currentUser.username ? (
-          <button onClick={handleRemove}>remove</button>
-        ) : (
-          ''
-        )}
+      <div style={{ display: visible ? '' : 'none' }} className='togglableContent'>
+        <div>{' '}{blog.url}</div>
+        <div>
+          {' '}
+          {blog.likes} likes <button onClick={handleLike}>like</button>{' '}
+        </div>
+        <div> added by: {blog.user.name} </div>
+        <div>
+          {currentUser && blog.user.username === currentUser.username ? (
+            <button onClick={handleRemove}>remove</button>
+          ) : (
+            ''
+          )}{' '}
+        </div>
       </div>
     </div>
   )

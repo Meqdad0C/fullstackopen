@@ -18,7 +18,7 @@ describe('<Blog />', () => {
     },
   }
 
-  test('renders content', () => {
+  test('renders title', () => {
     const { container } = render(<Blog blog={blog} />)
     const div = container.querySelector('.blog')
     expect(div).toHaveTextContent(
@@ -26,7 +26,28 @@ describe('<Blog />', () => {
     )
   })
 
-  test('clicking the buttons calls event handler once', async () => {
+  test('renders title and author but not url and like', () => {
+    const { container } = render(<Blog blog={blog} />)
+    const blogDiv = container.querySelector('.blog')
+    expect(blogDiv).toHaveTextContent(
+      'Component testing is done with react-testing-library'
+    )
+    expect(blogDiv).toHaveTextContent('Test Author')
+
+    const div = container.querySelector('.togglableContent')
+    expect(div).toHaveStyle('display: none')
+  })
+
+  test('renders url and likes when view button is clicked', async () => {
+    const { container } = render(<Blog blog={blog} />)
+    const button = screen.getByText('view')
+    await userEvent.click(button)
+
+    const div = container.querySelector('.togglableContent')
+    expect(div).not.toHaveStyle('display: none')
+  })
+
+  test('clicking the like button twice calls event handler twice', async () => {
     const mockHandler = { doLike: jest.fn(), doRemove: jest.fn() }
     render(<Blog blog={blog} handlers={mockHandler} />)
     const user = userEvent.setup()
