@@ -36,10 +36,7 @@ const Blog = ({ blog, handlers }) => {
       </button>
       <div style={{ display: visible ? '' : 'none' }}>
         {blog.url} <br />
-        {blog.likes} likes{' '}
-        <button onClick={handleLike} data-id={blog.id}>
-          like
-        </button>
+        {blog.likes} likes <button onClick={handleLike}>like</button>
         <p>added by: {blog.user.name}</p>
         {currentUser && blog.user.username === currentUser.username ? (
           <button onClick={handleRemove}>remove</button>

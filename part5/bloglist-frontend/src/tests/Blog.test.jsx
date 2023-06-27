@@ -1,31 +1,10 @@
 /* eslint-disable no-undef */
-import React from 'react'
 import '@testing-library/jest-dom/extend-expect'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Blog from '../components/Blog.jsx'
 
-test('renders content', () => {
-  const blog = {
-    title: 'Component testing is done with react-testing-library',
-    author: 'Test Author',
-    url: 'http://localhost:3000',
-    likes: 0,
-    user: {
-      username: 'testuser',
-      name: 'Test User',
-    },
-  }
-  const { container } = render(<Blog blog={blog} />)
-
-  const div = container.querySelector('.blog')
-  screen.debug(div)
-  expect(div).toHaveTextContent(
-    'Component testing is done with react-testing-library'
-  )
-})
-
-test('clicking the button calls event handler once', async () => {
+describe('<Blog />', () => {
   const blog = {
     title: 'Component testing is done with react-testing-library',
     author: 'Test Author',
@@ -38,14 +17,22 @@ test('clicking the button calls event handler once', async () => {
       name: 'Ciri',
     },
   }
-  const mockHandler = jest.fn()
 
-  const container = render(<Blog blog={blog} setBlogs={mockHandler} />)
-  const user = userEvent.setup()
-  const button = screen.getByText('like')
-  screen.debug(button)
-  await user.click(button)
-  await user.click(button)
-  expect(mockHandler.mock.calls).toHaveLength(2)
+  test('renders content', () => {
+    const { container } = render(<Blog blog={blog} />)
+    const div = container.querySelector('.blog')
+    expect(div).toHaveTextContent(
+      'Component testing is done with react-testing-library'
+    )
+  })
+
+  test('clicking the buttons calls event handler once', async () => {
+    const mockHandler = { doLike: jest.fn(), doRemove: jest.fn() }
+    render(<Blog blog={blog} handlers={mockHandler} />)
+    const user = userEvent.setup()
+    const button = screen.getByText('like')
+    await user.click(button)
+    await user.click(button)
+    expect(mockHandler.doLike.mock.calls).toHaveLength(2)
+  })
 })
-

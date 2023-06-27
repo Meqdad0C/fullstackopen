@@ -1,8 +1,9 @@
 /* eslint-disable no-undef */
 import { render, screen } from '@testing-library/react'
 import Toggleable from '../components/Toggleable.jsx'
-import userEvent from '@testing-library/user-event/index'
 import React from 'react'
+import '@testing-library/jest-dom/extend-expect'
+import userEvent from '@testing-library/user-event'
 
 describe('<Toggleable />', () => {
   let container

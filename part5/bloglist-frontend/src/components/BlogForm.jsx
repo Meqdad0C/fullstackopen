@@ -20,7 +20,7 @@ const BlogForm = ({ handleSubmit }) => {
   }
 
   return (
-    <>
+    <div className="blogFormDiv">
       <h2>blog form</h2>
       <form onSubmit={submitNewBlog}>
         <div>
@@ -29,6 +29,7 @@ const BlogForm = ({ handleSubmit }) => {
             type="text"
             value={newBlogTitle}
             name="Title"
+            placeholder={'Title'}
             onChange={({ target }) => setNewBlogTitle(target.value)}
             autoComplete={'off'}
           />
@@ -39,6 +40,7 @@ const BlogForm = ({ handleSubmit }) => {
             type="text"
             value={newBlogAuthor}
             name="Author"
+            placeholder={'Author'}
             onChange={({ target }) => setNewBlogAuthor(target.value)}
             autoComplete={'off'}
           />
@@ -49,13 +51,14 @@ const BlogForm = ({ handleSubmit }) => {
             type="text"
             value={newBlogUrl}
             name="Url"
+            placeholder={'Url'}
             onChange={({ target }) => setNewBlogUrl(target.value)}
             autoComplete={'off'}
           />
         </div>
         <button type="submit">create</button>
       </form>
-    </>
+    </div>
   )
 }
 
