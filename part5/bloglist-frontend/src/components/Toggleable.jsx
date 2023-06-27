@@ -2,7 +2,7 @@ import { useState, forwardRef, useImperativeHandle } from 'react'
 import PropTypes from 'prop-types'
 
 const Toggleable = forwardRef((props, refs) => {
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(props.initialVisibility)
 
   const hideWhenVisible = { display: visible ? 'none' : '' }
   const showWhenVisible = { display: visible ? '' : 'none' }

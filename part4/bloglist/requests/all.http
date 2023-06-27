@@ -35,12 +35,12 @@ Content-Type: application/json
 ###
 POST {{host}}/api/blogs
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNpcmkiLCJpZCI6IjY0OTc5Y2FmYzNjMjgyNWJlOWZiMzJmZCIsImlhdCI6MTY4Nzc2MTE3OH0.W-XNFUlEE0abYDCVQKUtxCKTQlmeBob4f_K7Oy8eP4Y
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1lcWRhZCIsImlkIjoiNjQ5NzgxMzQ4Yzg4Mzc5MjJjMjQ2NGVkIiwiaWF0IjoxNjg3ODczNzQxfQ.AEhtP6Y-qDX-A6o6ajhT6sPBfe-4h5x-H-DSOWuCzJg
 
 {
-  "author": "Sophia",
-  "likes": 421,
-  "title": "To Kill a Mockingbird",
+  "author": "Sophia AA",
+  "likes": 9999,
+  "title": "To Kill a AA",
   "url": "SophiaBooks.com",
   "user": "64979cafc3c2825be9fb32fd"
 }

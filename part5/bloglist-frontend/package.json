@@ -8,12 +8,15 @@
     "build": "vite build",
     "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "test": "jest --verbose --runInBand"
+    "test": "jest --verbose --runInBand",
+    "cypress:open": "cypress open",
+    "test:e2e": "cypress run"
   },
   "jest": {
     "testEnvironment": "jsdom"
   },
   "dependencies": {
+    "@cypress/vite-dev-server": "^5.0.5",
     "axios": "^1.4.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
@@ -29,7 +32,11 @@
     "@types/react-dom": "^18.0.11",
     "@vitejs/plugin-react": "^4.0.0",
     "babel-jest": "^29.5.0",
+    "cypress": "^12.16.0",
+    "cypress-vite": "^1.4.0",
     "eslint": "^8.38.0",
+    "eslint-plugin-cypress": "^2.13.3",
+    "eslint-plugin-jest": "^27.2.2",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.4",

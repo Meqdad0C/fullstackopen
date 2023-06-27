@@ -81,7 +81,7 @@ const App = () => {
       <h1>Blog List</h1>
       <Notification message={notificationMessage} errorRef={errorRef} />
       {user === null ? (
-        <Toggleable buttonLabel="login">
+        <Toggleable buttonLabel="login" initialVisibility={true}>
           <LoginForm handleLogin={handleLogin} />
         </Toggleable>
       ) : (

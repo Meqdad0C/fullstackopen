@@ -24,7 +24,7 @@ blogRouter.get('/:id', async (request, response) => {
 blogRouter.put('/:id', async (request, response) => {
   // ? how to make it right or what is the best practice
   const _id = request.params.id
-/*  const blog = await Blog.findById(_id)
+  /*  const blog = await Blog.findById(_id)
   const user = request.user
 
   if (blog.user.toString() !== user.id.toString()) {
@@ -65,12 +65,13 @@ blogRouter.delete('/:id', userExtractor, async (request, response) => {
 })
 
 blogRouter.post('/', userExtractor, async (request, response) => {
-  const { author, url, title } = request.body
+  const { author, url, title, likes } = request.body
   const user = request.user
   const blog = new Blog({
     author,
     url,
     title,
+    likes,
     user: user.id,
   })
 

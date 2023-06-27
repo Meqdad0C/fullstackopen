@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 
-
 const LoginForm = ({ handleLogin }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -34,7 +33,9 @@ const LoginForm = ({ handleLogin }) => {
           onChange={({ target }) => setPassword(target.value)}
         />
       </div>
-      <button type="submit">login</button>
+      <button type="submit" id="Login">
+        do
+      </button>
     </form>
   )
 }
