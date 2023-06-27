@@ -1,127 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog.jsx'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import  Toggleable  from './components/Toggleable'
 import './App.css'
-import Toggleable from './components/Toggleable.jsx'
-import PropTypes from 'prop-types'
-
-const LoginForm = ({ handleLogin }) => {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-
-  const submitCredentials = async (event) => {
-    event.preventDefault()
-    handleLogin({ username, password })
-    setUsername('')
-    setPassword('')
-  }
-
-  return (
-    <form onSubmit={submitCredentials}>
-      <div>
-        username{' '}
-        <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-          autoComplete={'off'}
-        />
-      </div>
-      <div>
-        password{' '}
-        <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
-  )
-}
-LoginForm.propTypes = {
-  handleLogin: PropTypes.func.isRequired,
-}
-const Notification = ({ message, errorRef }) => {
-  if (message === null) {
-    return null
-  }
-
-  return <div className={errorRef.current ? 'error' : 'success'}>{message}</div>
-}
-
-const BlogForm = ({ handleSubmit }) => {
-  const [newBlogTitle, setNewBlogTitle] = useState('')
-  const [newBlogAuthor, setNewBlogAuthor] = useState('')
-  const [newBlogUrl, setNewBlogUrl] = useState('')
-
-  const submitNewBlog = async (event) => {
-    event.preventDefault()
-    const blogObject = {
-      title: newBlogTitle,
-      author: newBlogAuthor,
-      url: newBlogUrl,
-    }
-    handleSubmit(blogObject)
-
-    setNewBlogTitle('')
-    setNewBlogAuthor('')
-    setNewBlogUrl('')
-  }
-
-  return (
-    <>
-      <h2>blog form</h2>
-      <form onSubmit={submitNewBlog}>
-        <div>
-          title:
-          <input
-            type="text"
-            value={newBlogTitle}
-            name="Title"
-            onChange={({ target }) => setNewBlogTitle(target.value)}
-            autoComplete={'off'}
-          />
-        </div>
-        <div>
-          Author:
-          <input
-            type="text"
-            value={newBlogAuthor}
-            name="Author"
-            onChange={({ target }) => setNewBlogAuthor(target.value)}
-            autoComplete={'off'}
-          />
-        </div>
-        <div>
-          url:
-          <input
-            type="text"
-            value={newBlogUrl}
-            name="Url"
-            onChange={({ target }) => setNewBlogUrl(target.value)}
-            autoComplete={'off'}
-          />
-        </div>
-        <button type="submit">create</button>
-      </form>
-    </>
-  )
-}
-
-const DisplayBlogs = ({ blogs, setBlogs }) => {
-  return (
-    <div>
-      <h2>blogs</h2>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} setBlogs={setBlogs} />
-      ))}
-    </div>
-  )
-}
+import  LoginForm  from './components/LoginForm'
+import  BlogForm  from './components/BlogForm'
+import  DisplayBlogs  from './components/DisplayBlogs'
+import  Notification  from './components/Notification'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -187,6 +72,9 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogAppUser')
     setUser(null)
   }
+
+
+
 
   return (
     <>
