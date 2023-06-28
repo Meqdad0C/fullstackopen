@@ -16,7 +16,7 @@ const AnecdoteForm = (props) => {
       <h2>create new</h2>
       <form onSubmit={addAnecdote}>
         <div>
-          <input autoComplete="off" name="anecdote" />
+          <input autoComplete="off" type="text" name="anecdote" />
         </div>
         <button type="submit">create</button>
       </form>
