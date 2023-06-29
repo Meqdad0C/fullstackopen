@@ -1,12 +1,29 @@
 import { useMutation, useQueryClient } from "react-query";
-import { postAnecdote } from "../App";
-
+import anecdoteService from "../services/anecdotes";
+import { useContext } from "react";
+import NotificationContext from "../NotifcationContext";
 const AnecdoteForm = () => {
+  const [message, messageDispatch] = useContext(NotificationContext);
   const queryClient = useQueryClient();
-
-  const createAnecdoteMutation = useMutation(postAnecdote, {
-    onSuccess: () => {
+  const createAnecdoteMutation = useMutation(anecdoteService.postAnecdote, {
+    onSuccess: (anecdote) => {
       queryClient.invalidateQueries("anecdotes");
+      messageDispatch({
+        type: "SET_MESSAGE",
+        payload: `You created '${anecdote.content}'`,
+      });
+      setTimeout(() => {
+        messageDispatch({ type: "CLEAR_MESSAGE" });
+      }, 5000);
+    },
+    onError: (error) => {
+      messageDispatch({
+        type: "SET_MESSAGE",
+        payload: `An error has occurred: ${JSON.parse(JSON.stringify(error.response.data)).error}`,
+      });
+      setTimeout(() => {
+        messageDispatch({ type: "CLEAR_MESSAGE" });
+      }, 5000);
     },
   });
 
