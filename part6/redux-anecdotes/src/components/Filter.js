@@ -1,4 +1,3 @@
-import { filterChange } from '../reducers/filterReducer'
 import { useDispatch } from 'react-redux'
 
 const Filter = () => {
@@ -13,7 +12,7 @@ const Filter = () => {
           type="text"
           name="search"
           onChange={(event) => {
-            dispatch(filterChange(event.target.value))
+            dispatch({ type: 'filter/setFilter', payload: { filter: event.target.value } })
           }}
         />
       </div>
