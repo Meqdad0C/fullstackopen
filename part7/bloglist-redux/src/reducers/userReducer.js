@@ -7,7 +7,8 @@ const userSlice = createSlice({
   initialState: null,
   reducers: {
     setUser(state, action) {
-      return action.payload.user
+      const { username, name } = action.payload.user
+      return { username, name }
     },
     clearUser(state) {
       return null
@@ -26,12 +27,11 @@ export const initializeUser = () => {
   }
 }
 
-export const loginUser = ({username,password}) => {
+export const loginUser = ({ username, password }) => {
   return async (dispatch) => {
     const user = await loginService.login({ username, password })
-    window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
     blogService.setToken(user.token)
-    delete user.token
+    window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
     dispatch({ type: 'user/setUser', payload: { user } })
   }
 }

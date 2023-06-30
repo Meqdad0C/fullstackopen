@@ -23,7 +23,6 @@ const notificationSlice = createSlice({
 })
 
 export const sendNotification = ({ message, time_s, isError }) => {
-  console.log('sendNotification')
   const notification_time_s = time_s || 5
   const type = isError ? 'error' : 'success'
   return (dispatch) => {

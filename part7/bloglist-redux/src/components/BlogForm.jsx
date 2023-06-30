@@ -1,9 +1,19 @@
 import { useState } from 'react'
+import { sendNotification } from '../reducers/notificationReducer.js'
+import { useDispatch } from 'react-redux'
+import { createBlog } from '../reducers/blogReducer.js'
 
-const BlogForm = ({ handleSubmit }) => {
+const BlogForm = ({ parentRef }) => {
+  const dispatch = useDispatch()
   const [newBlogTitle, setNewBlogTitle] = useState('')
   const [newBlogAuthor, setNewBlogAuthor] = useState('')
   const [newBlogUrl, setNewBlogUrl] = useState('')
+
+  const resetForm = () => {
+    setNewBlogAuthor('')
+    setNewBlogTitle('')
+    setNewBlogUrl('')
+  }
 
   const submitNewBlog = async (event) => {
     event.preventDefault()
@@ -12,11 +22,23 @@ const BlogForm = ({ handleSubmit }) => {
       author: newBlogAuthor,
       url: newBlogUrl,
     }
-    handleSubmit(blogObject)
-
-    setNewBlogTitle('')
-    setNewBlogAuthor('')
-    setNewBlogUrl('')
+    try {
+      parentRef.current.toggleVisibility()
+      await dispatch(createBlog(blogObject))
+      dispatch(
+        sendNotification({
+          message: `a new blog ${blogObject.title} by ${blogObject.author} added`,
+        })
+      )
+      resetForm()
+    } catch (exception) {
+      dispatch(
+        sendNotification({
+          message: 'Error adding blog: Fill missing fields',
+          isError: true,
+        })
+      )
+    }
   }
 
   return (

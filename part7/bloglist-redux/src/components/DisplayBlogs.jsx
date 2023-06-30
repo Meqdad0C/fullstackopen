@@ -1,6 +1,9 @@
 import Blog from './Blog.jsx'
+import { useSelector } from 'react-redux'
 
-const DisplayBlogs = ({ blogs }) => {
+const DisplayBlogs = () => {
+  const blogs = useSelector((state) => state.blogs)
+
   const byLikes = (b1, b2) => b2.likes - b1.likes
 
   return (

@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 import blogService from '../services/blogs'
 const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
-const current_user = JSON.parse(loggedUserJSON)
+const { name, username } = JSON.parse(loggedUserJSON)
+const current_user = { name, username }
 
 const blogSlice = createSlice({
   name: 'blogs',
@@ -38,8 +39,7 @@ export const createBlog = (blog) => {
     const newBlog = await blogService.create(blog)
     newBlog.user = {
       id: newBlog.user,
-      name: current_user.name,
-      username: current_user.username,
+      ...current_user,
     }
     dispatch({ type: 'blogs/addBlog', payload: { newBlog } })
   }
