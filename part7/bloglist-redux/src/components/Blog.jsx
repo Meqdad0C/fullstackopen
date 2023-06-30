@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { deleteBlog, updateBlog } from '../reducers/blogReducer.js'
 import { useDispatch } from 'react-redux'
+import { sendNotification } from '../reducers/notificationReducer.js'
 
 const Blog = ({ blog }) => {
   const dispatch = useDispatch()
@@ -15,15 +16,17 @@ const Blog = ({ blog }) => {
 
   const handleLike = (event) => {
     event.preventDefault()
-    dispatch(updateBlog({ ...blog, likes: blog.likes + 1 }))
-      .catch((error) => console.log(error.message))
+    dispatch(updateBlog({ ...blog, likes: blog.likes + 1 })).catch((error) =>
+      sendNotification({ message: error.message, isError: true })
+    )
   }
 
   const handleRemove = (event) => {
     event.preventDefault()
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      dispatch(deleteBlog(blog.id))
-        .catch((error) => dispatch({ type: 'notification/error', payload: { error: error.message } })
+      dispatch(deleteBlog(blog.id)).catch((error) =>
+        sendNotification({ message: error.message, isError: true })
+      )
     }
   }
 
@@ -41,8 +44,11 @@ const Blog = ({ blog }) => {
           {visible ? 'hide' : 'view'}
         </button>
       </div>
-      <div style={{ display: visible ? '' : 'none' }} className='togglableContent'>
-        <div>{' '}{blog.url}</div>
+      <div
+        style={{ display: visible ? '' : 'none' }}
+        className="togglableContent"
+      >
+        <div> {blog.url}</div>
         <div>
           {' '}
           {blog.likes} likes <button onClick={handleLike}>like</button>{' '}
