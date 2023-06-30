@@ -1,5 +1,6 @@
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const Comment = require('../models/comment')
 const {
   checkAuthHeader,
   throwMyCustomError,
@@ -8,7 +9,9 @@ const {
 const blogRouter = require('express').Router()
 
 blogRouter.get('/', async (request, response) => {
-  const blogs = await Blog.find({}).populate('user', { blogs: 0 })
+  const blogs = await Blog.find({})
+    .populate('user', { blogs: 0 })
+    .populate('comments')
   response.json(blogs)
 })
 
@@ -80,6 +83,24 @@ blogRouter.post('/', userExtractor, async (request, response) => {
   await user.save()
 
   response.status(201).json(savedBlog)
+})
+
+blogRouter.post('/:id/comments', async (request, response) => {
+  const { content } = request.body
+  const blog = await Blog.findById(request.params.id)
+  const comment = new Comment({
+    content,
+  })
+  const savedComment = await comment.save()
+  blog.comments = blog.comments.concat(savedComment.id)
+  await blog.save()
+
+  response.status(201).json(savedComment)
+})
+
+blogRouter.get('/:id/comments', async (request, response) => {
+  const blog = await Blog.findById(request.params.id).populate('comments')
+  response.json(blog.comments)
 })
 
 module.exports = blogRouter
