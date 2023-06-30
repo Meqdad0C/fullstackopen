@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { deleteBlog, updateBlog } from '../reducers/blogReducer.js'
 import { useDispatch } from 'react-redux'
 import { sendNotification } from '../reducers/notificationReducer.js'
+import { Link } from 'react-router-dom'
 
 const Blog = ({ blog }) => {
   const dispatch = useDispatch()
@@ -38,7 +39,7 @@ const Blog = ({ blog }) => {
     <div style={blogStyle} className="blog">
       <div>
         <div>
-          {blog.title} - {blog.author}
+          <Link to={`/blogs/${blog.id}`}>{blog.title} - {blog.author} </Link>
         </div>
         <button onClick={() => setVisible(!visible)}>
           {visible ? 'hide' : 'view'}

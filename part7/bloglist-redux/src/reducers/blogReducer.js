@@ -1,8 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
 import blogService from '../services/blogs'
-const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
-const { name, username } = JSON.parse(loggedUserJSON)
-const current_user = { name, username }
 
 const blogSlice = createSlice({
   name: 'blogs',
@@ -34,7 +31,7 @@ export const initializeBlogs = () => {
   }
 }
 
-export const createBlog = (blog) => {
+export const createBlog = (blog,current_user) => {
   return async (dispatch) => {
     const newBlog = await blogService.create(blog)
     newBlog.user = {

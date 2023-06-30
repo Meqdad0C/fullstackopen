@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { sendNotification } from '../reducers/notificationReducer.js'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { createBlog } from '../reducers/blogReducer.js'
 
 const BlogForm = ({ parentRef }) => {
+  const user = useSelector((state) => state.user)
   const dispatch = useDispatch()
   const [newBlogTitle, setNewBlogTitle] = useState('')
   const [newBlogAuthor, setNewBlogAuthor] = useState('')
@@ -24,7 +25,7 @@ const BlogForm = ({ parentRef }) => {
     }
     try {
       parentRef.current.toggleVisibility()
-      await dispatch(createBlog(blogObject))
+      await dispatch(createBlog(blogObject, user))
       dispatch(
         sendNotification({
           message: `a new blog ${blogObject.title} by ${blogObject.author} added`,
