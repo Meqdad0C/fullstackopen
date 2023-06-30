@@ -1,25 +1,26 @@
 import { useState, useEffect, useRef } from 'react'
 import blogService from './services/blogs'
 import loginService from './services/login'
-import  Toggleable  from './components/Toggleable'
+import Toggleable from './components/Toggleable'
 import './App.css'
-import  LoginForm  from './components/LoginForm'
-import  BlogForm  from './components/BlogForm'
-import  DisplayBlogs  from './components/DisplayBlogs'
-import  Notification  from './components/Notification'
+import LoginForm from './components/LoginForm'
+import BlogForm from './components/BlogForm'
+import DisplayBlogs from './components/DisplayBlogs'
+import Notification from './components/Notification'
+import { useDispatch, useSelector } from 'react-redux'
+import { sendNotification } from './reducers/notificationReducer.js'
+import { initializeBlogs } from './reducers/blogReducer.js'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+  // const [blogs, setBlogs] = useState([])
+  const blogs = useSelector((state) => state.blogs)
   const [user, setUser] = useState(null)
-  const [notificationMessage, setNotificationMessage] = useState(null)
-  let errorRef = useRef(false)
+  const dispatch = useDispatch()
+  const notification = useSelector((state) => state.notification)
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => {
-      blogs.sort((a, b) => b.likes - a.likes)
-      setBlogs(blogs)
-    })
+    dispatch(initializeBlogs())
   }, [])
 
   useEffect(() => {
@@ -31,38 +32,39 @@ const App = () => {
     }
   }, [])
 
-  const handleNotification = (message, error_flag) => {
-    if (error_flag) errorRef.current = true
-    setNotificationMessage(message)
-    setTimeout(() => {
-      setNotificationMessage(null)
-      if (error_flag) errorRef.current = false
-    }, 5000)
+  const handleNotification = (message, isError) => {
+    const notification = {
+      message,
+      type: isError ? 'error' : 'success',
+    }
+    dispatch(sendNotification(notification, 5))
   }
 
   const handleSubmit = async (blogObject) => {
     try {
       blogFormRef.current.toggleVisibility()
-      const returnedBlog = await blogService.create(blogObject)
-      returnedBlog.user = {
-        id: returnedBlog.user,
+      const newBlog = await blogService.create(blogObject)
+      newBlog.user = {
+        id: newBlog.user,
         username: user.username,
         name: user.name,
       }
-      setBlogs(blogs.concat(returnedBlog))
-      handleNotification('Blog added successfully!', false)
+      dispatch({ type: 'blogs/addBlog', payload: { newBlog } })
+      handleNotification(
+        `a new blog ${newBlog.title} by ${newBlog.author} added`
+      )
     } catch (exception) {
-      handleNotification('Fill missing fields!', true)
+      handleNotification('Error adding blog: Fill missing fields', true)
     }
   }
 
   const handleLogin = async (userObject) => {
     try {
       const user = await loginService.login(userObject)
-
       window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
       blogService.setToken(user.token)
       setUser(user)
+      handleNotification(`welcome back ${user.name}`)
     } catch (exception) {
       handleNotification('Wrong credentials', true)
     }
@@ -70,16 +72,14 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogAppUser')
+    handleNotification(`logged out ${user.name}`)
     setUser(null)
   }
-
-
-
 
   return (
     <>
       <h1>Blog List</h1>
-      <Notification message={notificationMessage} errorRef={errorRef} />
+      <Notification notification={notification} />
       {user === null ? (
         <Toggleable buttonLabel="login" initialVisibility={true}>
           <LoginForm handleLogin={handleLogin} />
@@ -92,15 +92,12 @@ const App = () => {
           </div>
           {
             <Toggleable buttonLabel="new blog" ref={blogFormRef}>
-              <BlogForm
-                handleSubmit={handleSubmit}
-                handleNotification={handleNotification}
-              />
+              <BlogForm handleSubmit={handleSubmit} />
             </Toggleable>
           }
         </main>
       )}
-      <DisplayBlogs blogs={blogs} setBlogs={setBlogs} />
+      <DisplayBlogs blogs={blogs} />
     </>
   )
 }

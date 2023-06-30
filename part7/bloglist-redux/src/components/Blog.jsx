@@ -1,6 +1,9 @@
 import { useState } from 'react'
+import { deleteBlog, updateBlog } from '../reducers/blogReducer.js'
+import { useDispatch } from 'react-redux'
 
-const Blog = ({ blog, handlers }) => {
+const Blog = ({ blog }) => {
+  const dispatch = useDispatch()
   const [visible, setVisible] = useState(false)
   const blogStyle = {
     paddingTop: 10,
@@ -12,13 +15,15 @@ const Blog = ({ blog, handlers }) => {
 
   const handleLike = (event) => {
     event.preventDefault()
-    handlers.doLike(blog)
+    dispatch(updateBlog({ ...blog, likes: blog.likes + 1 }))
+      .catch((error) => console.log(error.message))
   }
 
   const handleRemove = (event) => {
     event.preventDefault()
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      handlers.doRemove(blog)
+      dispatch(deleteBlog(blog.id))
+        .catch((error) => dispatch({ type: 'notification/error', payload: { error: error.message } })
     }
   }
 
