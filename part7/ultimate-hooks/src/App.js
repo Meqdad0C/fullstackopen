@@ -11,26 +11,31 @@ const useField = (type) => {
   return {
     type,
     value,
-    onChange
+    onChange,
   }
 }
 
 const useResource = (baseUrl) => {
   const [resources, setResources] = useState([])
 
-  // ...
+  useEffect(() => {
+    axios.get(baseUrl).then((response) => {
+      setResources(response.data)
+      console.log(response.data)
+    })
+  }, [baseUrl])
 
-  const create = (resource) => {
-    // ...
+  const create = async (resource) => {
+    axios.post(baseUrl, resource).then((response) => {
+      setResources([...resources, response.data])
+    })
   }
 
   const service = {
-    create
+    create,
   }
 
-  return [
-    resources, service
-  ]
+  return [resources, service]
 }
 
 const App = () => {
@@ -41,14 +46,18 @@ const App = () => {
   const [notes, noteService] = useResource('http://localhost:3005/notes')
   const [persons, personService] = useResource('http://localhost:3005/persons')
 
-  const handleNoteSubmit = (event) => {
+  const handleNoteSubmit = async (event) => {
     event.preventDefault()
-    noteService.create({ content: content.value })
+    await noteService.create({ content: content.value })
+    event.target.value = ''
   }
- 
-  const handlePersonSubmit = (event) => {
+
+  const handlePersonSubmit =async  (event) => {
     event.preventDefault()
-    personService.create({ name: name.value, number: number.value})
+    await personService.create({ name: name.value, number: number.value })
+    event.target.value = ''
+    name.onChange(event)
+    number.onChange(event)
   }
 
   return (
@@ -58,15 +67,21 @@ const App = () => {
         <input {...content} />
         <button>create</button>
       </form>
-      {notes.map(n => <p key={n.id}>{n.content}</p>)}
+      {notes.map((n) => (
+        <p key={n.id}>{n.content}</p>
+      ))}
 
       <h2>persons</h2>
       <form onSubmit={handlePersonSubmit}>
-        name <input {...name} /> <br/>
+        name <input {...name} /> <br />
         number <input {...number} />
         <button>create</button>
       </form>
-      {persons.map(n => <p key={n.id}>{n.name} {n.number}</p>)}
+      {persons.map((n) => (
+        <p key={n.id}>
+          {n.name} {n.number}
+        </p>
+      ))}
     </div>
   )
 }
