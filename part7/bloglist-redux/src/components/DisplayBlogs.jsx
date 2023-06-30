@@ -1,5 +1,6 @@
 import Blog from './Blog.jsx'
 import { useSelector } from 'react-redux'
+import { Card } from 'react-bootstrap'
 
 const DisplayBlogs = () => {
   const blogs = useSelector((state) => state.blogs)
@@ -9,9 +10,16 @@ const DisplayBlogs = () => {
   return (
     <div>
       <h2>blogs</h2>
-      {blogs.slice().sort(byLikes).map((blog) => (
-        <Blog key={blog.id} blog={blog} />
-      ))}
+      <Card>
+        <Card.Body>
+          {blogs
+            .slice()
+            .sort(byLikes)
+            .map((blog) => (
+              <Blog key={blog.id} blog={blog} />
+            ))}
+        </Card.Body>
+      </Card>
     </div>
   )
 }

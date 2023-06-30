@@ -3,17 +3,11 @@ import { deleteBlog, updateBlog } from '../reducers/blogReducer.js'
 import { useDispatch } from 'react-redux'
 import { sendNotification } from '../reducers/notificationReducer.js'
 import { Link } from 'react-router-dom'
+import { Card, Button, Badge } from 'react-bootstrap'
 
 const Blog = ({ blog }) => {
   const dispatch = useDispatch()
   const [visible, setVisible] = useState(false)
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 10,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  }
 
   const handleLike = (event) => {
     event.preventDefault()
@@ -36,34 +30,33 @@ const Blog = ({ blog }) => {
   )
 
   return (
-    <div style={blogStyle} className="blog">
-      <div>
-        <div>
-          <Link to={`/blogs/${blog.id}`}>{blog.title} - {blog.author} </Link>
-        </div>
-        <button onClick={() => setVisible(!visible)}>
-          {visible ? 'hide' : 'view'}
-        </button>
-      </div>
-      <div
-        style={{ display: visible ? '' : 'none' }}
-        className="togglableContent"
-      >
-        <div> {blog.url}</div>
-        <div>
-          {' '}
-          {blog.likes} likes <button onClick={handleLike}>like</button>{' '}
-        </div>
-        <div> added by: {blog.user.name} </div>
-        <div>
-          {currentUser && blog.user.username === currentUser.username ? (
-            <button onClick={handleRemove}>remove</button>
-          ) : (
-            ''
-          )}{' '}
-        </div>
-      </div>
-    </div>
+    <Card className="blog mb-3">
+      <Card.Body>
+        <Card.Title>
+          <Link to={`/blogs/${blog.id}`}>{blog.title} - {blog.author}</Link>
+        </Card.Title>
+        <Button variant="primary" size="sm" onClick={() => setVisible(!visible)}>
+          {visible ? 'Hide' : 'View'}
+        </Button>
+        {visible && (
+          <div className="mt-3">
+            <Card.Text>{blog.url}</Card.Text>
+            <Card.Text>
+              {blog.likes} likes{' '}
+              <Button variant="success" size="sm" onClick={handleLike}>
+                Like
+              </Button>
+            </Card.Text>
+            <Card.Text>Added by: {blog.user.name}</Card.Text>
+            {currentUser && blog.user.username === currentUser.username && (
+              <Button variant="danger" size="sm" onClick={handleRemove}>
+                Remove
+              </Button>
+            )}
+          </div>
+        )}
+      </Card.Body>
+    </Card>
   )
 }
 

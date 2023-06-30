@@ -2,6 +2,7 @@ import { commentBlog, updateBlog } from '../reducers/blogReducer.js'
 import { sendNotification } from '../reducers/notificationReducer.js'
 import { useDispatch } from 'react-redux'
 import { useState } from 'react'
+import { Button, Form, ListGroup, Container, Row, Col } from 'react-bootstrap'
 
 const BlogView = ({ blog }) => {
   if (!blog) {
@@ -32,33 +33,41 @@ const BlogView = ({ blog }) => {
   }
 
   return (
-    <div>
-      <div>
-        <h1>
-          {blog.title} by {blog.author}
-        </h1>
-        {blog.url}
-        <br />
-        {blog.likes} likes <button onClick={handleLike}>like</button> <br />
-        added by {blog.user.name}
-      </div>
-      <div>
-        <h2>comments</h2>
-        <ul>
-          {blog.comments.map((comment) => (
-            <li key={comment.id}>{comment.content}</li>
-          ))}
-        </ul>
-        <form onSubmit={handleComment}>
-          <input
-            type="text"
-            value={comment}
-            onChange={({ target }) => setComment(target.value)}
-          />
-          <button type="submit">add comment</button>
-        </form>
-      </div>
-    </div>
+    <Container>
+      <Row>
+        <Col>
+          <h1>
+            {blog.title} by {blog.author}
+          </h1>
+          {blog.url}
+          <br />
+          {blog.likes} likes{' '}
+          <Button variant="primary" onClick={handleLike}>
+            like
+          </Button>{' '}
+          <br />
+          added by {blog.user.name}
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <h2>comments</h2>
+          <ListGroup>
+            {blog.comments.map((comment) => (
+              <ListGroup.Item key={comment.id}>{comment.content}</ListGroup.Item>
+            ))}
+          </ListGroup>
+          <Form onSubmit={handleComment}>
+            <Form.Control
+              type="text"
+              value={comment}
+              onChange={({ target }) => setComment(target.value)}
+            />
+            <Button type="submit">add comment</Button>
+          </Form>
+        </Col>
+      </Row>
+    </Container>
   )
 }
 

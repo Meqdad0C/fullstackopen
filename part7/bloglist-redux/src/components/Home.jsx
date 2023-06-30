@@ -1,6 +1,5 @@
 import Toggleable from './Toggleable.jsx'
 import LoginForm from './LoginForm.jsx'
-import Header from './Header.jsx'
 import BlogForm from './BlogForm.jsx'
 import DisplayBlogs from './DisplayBlogs.jsx'
 import { useRef } from 'react'

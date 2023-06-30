@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { Table } from 'react-bootstrap'
 import _ from 'lodash'
 
 const Users = () => {
@@ -16,24 +17,24 @@ const Users = () => {
   return (
     <div>
       <h1>Users</h1>
-      <table className="table">
+      <Table striped bordered hover>
         <thead>
-          <tr>
-            <th>User</th>
-            <th>Blogs created</th>
-          </tr>
+        <tr>
+          <th>User</th>
+          <th>Blogs created</th>
+        </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td>
-                <Link to={`/users/${user.id}`}>{user.name}</Link>
-              </td>
-              <td>{user.number_of_blogs}</td>
-            </tr>
-          ))}
+        {users.map((user) => (
+          <tr key={user.id}>
+            <td>
+              <Link to={`/users/${user.id}`}>{user.name}</Link>
+            </td>
+            <td>{user.number_of_blogs}</td>
+          </tr>
+        ))}
         </tbody>
-      </table>
+      </Table>
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { sendNotification } from '../reducers/notificationReducer.js'
 import { useDispatch, useSelector } from 'react-redux'
 import { createBlog } from '../reducers/blogReducer.js'
+import { Form, Button } from 'react-bootstrap'
 
 const BlogForm = ({ parentRef }) => {
   const user = useSelector((state) => state.user)
@@ -45,44 +46,41 @@ const BlogForm = ({ parentRef }) => {
   return (
     <div className="blogFormDiv">
       <h2>blog form</h2>
-      <form onSubmit={submitNewBlog}>
-        <div>
-          title:
-          <input
+      <Form onSubmit={submitNewBlog}>
+        <Form.Group controlId="title">
+          <Form.Label>Title:</Form.Label>
+          <Form.Control
             type="text"
             value={newBlogTitle}
-            name="Title"
-            placeholder={'Title'}
+            placeholder="Title"
             onChange={({ target }) => setNewBlogTitle(target.value)}
-            autoComplete={'off'}
+            autoComplete="off"
           />
-        </div>
-        <div>
-          Author:
-          <input
+        </Form.Group>
+        <Form.Group controlId="author">
+          <Form.Label>Author:</Form.Label>
+          <Form.Control
             type="text"
             value={newBlogAuthor}
-            name="Author"
-            placeholder={'Author'}
+            placeholder="Author"
             onChange={({ target }) => setNewBlogAuthor(target.value)}
-            autoComplete={'off'}
+            autoComplete="off"
           />
-        </div>
-        <div>
-          url:
-          <input
+        </Form.Group>
+        <Form.Group controlId="url">
+          <Form.Label>URL:</Form.Label>
+          <Form.Control
             type="text"
             value={newBlogUrl}
-            name="Url"
-            placeholder={'Url'}
+            placeholder="URL"
             onChange={({ target }) => setNewBlogUrl(target.value)}
-            autoComplete={'off'}
+            autoComplete="off"
           />
-        </div>
-        <button type="submit">create</button>
-      </form>
+        </Form.Group>
+        <Button variant="primary" type="submit">Create</Button>
+      </Form>
     </div>
   )
 }
 
-export default BlogForm
+export default BlogForm;
