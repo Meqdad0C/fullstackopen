@@ -1,25 +1,57 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import './App.css'
-
+import LoginForm from './components/LoginForm'
+import { Link, Routes, Route } from 'react-router-dom'
+import { useApolloClient } from '@apollo/client'
 const App = () => {
-  const [page, setPage] = useState('authors')
+  const client = useApolloClient()
+  const [token, setToken] = useState(null)
+
+  useEffect(() => {
+    const token = localStorage.getItem('library-user-token')
+    if (token) {
+      setToken(token)
+    }
+  }, [])
+
+  const handleLogout = () => {
+    client.resetStore()
+    localStorage.clear()
+    setToken(null)
+  }
 
   return (
     <div>
       <div>
-        <button onClick={() => setPage('authors')}>authors</button>
-        <button onClick={() => setPage('books')}>books</button>
-        <button onClick={() => setPage('add')}>add book</button>
+        <Link to="/">
+          <button>authors</button>
+        </Link>
+        <Link to="/books">
+          <button>books</button>
+        </Link>
+        {token === null ? (
+          <Link to="/login">
+            <button>login</button>
+          </Link>
+        ) : (
+          <span>
+            <Link to="/add">
+              <button>add book</button>
+            </Link>
+            <button onClick={handleLogout}>logout</button>
+          </span>
+        )}
       </div>
 
-      <Authors show={page === 'authors'} />
-
-      <Books show={page === 'books'} />
-
-      <NewBook show={page === 'add'} />
+      <Routes>
+        <Route path="/" element={<Authors />} />
+        <Route path="/books" element={<Books />} />
+        <Route path="/add" element={<NewBook />} />
+        <Route path="/login" element={<LoginForm setToken={setToken} />} />
+      </Routes>
     </div>
   )
 }
