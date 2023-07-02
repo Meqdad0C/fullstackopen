@@ -3,23 +3,31 @@ import { ALL_BOOKS, ME } from '../queries'
 import { useEffect, useState } from 'react'
 
 const RecommendedView = () => {
-  const result = useQuery(ALL_BOOKS)
+  const [getBooks, booksResult] = useLazyQuery(ALL_BOOKS)
   const userResult = useQuery(ME)
   const [books, setBooks] = useState([])
 
   useEffect(() => {
-    if (result.data) {
-      setBooks(result.data.allBooks)
+    if (userResult.data) {
+      getBooks({ variables: { genre: userResult.data.me.favoriteGenre } })
     }
-  }, [result.data])
+  }, [getBooks, userResult.data])
 
-  if (result.loading) {
+  useEffect(() => {
+    if (booksResult.data) {
+      console.log('setting books', booksResult.data)
+      setBooks(booksResult.data.allBooks)
+    }
+  }, [booksResult.data])
+
+  if (booksResult.loading) {
     return <div>loading...</div>
   }
   if (userResult.loading) {
     return <div>loading...</div>
   }
 
+  console.log('rendering')
   return (
     <div>
       <h1>Recommendations</h1>
@@ -33,17 +41,13 @@ const RecommendedView = () => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {books
-            .filter((b) => {
-              return b.genres.includes(userResult.data.me.favoriteGenre)
-            })
-            .map((b) => (
-              <tr key={b.title}>
-                <td>{b.title}</td>
-                <td>{b.author.name}</td>
-                <td>{b.published}</td>
-              </tr>
-            ))}
+          {books.map((b) => (
+            <tr key={b.title}>
+              <td>{b.title}</td>
+              <td>{b.author.name}</td>
+              <td>{b.published}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

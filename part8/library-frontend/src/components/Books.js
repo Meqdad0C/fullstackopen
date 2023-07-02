@@ -1,18 +1,24 @@
 import { ALL_BOOKS } from '../queries'
 import { useEffect, useState } from 'react'
-const { useQuery } = require('@apollo/client')
+import { useLazyQuery } from '@apollo/client'
 
-const Books = (props) => {
-  const result = useQuery(ALL_BOOKS)
+const Books = () => {
+  const [getBooks, booksResult] = useLazyQuery(ALL_BOOKS)
   const [books, setBooks] = useState([])
 
   useEffect(() => {
-    if (result.data) {
-      setBooks(result.data.allBooks)
-    }
-  }, [result.data])
+    getBooks()
+  }, [getBooks])
 
-  if (result.loading) {
+  useEffect(() => {
+    console.log(booksResult.data)
+    if (booksResult.data) {
+      console.log('setting books')
+      setBooks(booksResult.data.allBooks)
+    }
+  }, [booksResult.data])
+
+  if (booksResult.loading) {
     return <div>loading...</div>
   }
   const genres = books.map((b) => b.genres).flat()
@@ -20,12 +26,12 @@ const Books = (props) => {
   const handleGenreChange = (event) => {
     let chosenGenre = event.target.value
     if (event.target.value === 'All') {
-      setBooks(result.data.allBooks)
+      getBooks()
     } else {
-      setBooks(result.data.allBooks.filter((b) => b.genres.includes(chosenGenre)))
+      getBooks({ variables: { genre: chosenGenre } })
     }
   }
-  
+
   return (
     <div>
       <h2>books</h2>

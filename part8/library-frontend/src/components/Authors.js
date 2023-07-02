@@ -19,7 +19,7 @@ const Authors = (props) => {
     event.preventDefault()
     const name = event.target[0].value
     const born = event.target[1].value
-    console.log('update author...')
+    console.log('update author... with name: ', name, ' and born: ', born, '')
     await editAuthor({
       variables: { name: name, setBornTo: parseInt(born) },
     })
