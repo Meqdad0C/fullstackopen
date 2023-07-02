@@ -6,6 +6,7 @@ import './App.css'
 import LoginForm from './components/LoginForm'
 import { Link, Routes, Route } from 'react-router-dom'
 import { useApolloClient } from '@apollo/client'
+import RecommendedView from './components/RecommendedView'
 const App = () => {
   const client = useApolloClient()
   const [token, setToken] = useState(null)
@@ -41,6 +42,9 @@ const App = () => {
             <Link to="/add">
               <button>add book</button>
             </Link>
+            <Link to={'/recommendations'}>
+              <button> recommendations </button>
+            </Link>
             <button onClick={handleLogout}>logout</button>
           </span>
         )}
@@ -50,6 +54,7 @@ const App = () => {
         <Route path="/" element={<Authors />} />
         <Route path="/books" element={<Books />} />
         <Route path="/add" element={<NewBook />} />
+        <Route path="/recommendations" element={<RecommendedView />} />
         <Route path="/login" element={<LoginForm setToken={setToken} />} />
       </Routes>
     </div>
