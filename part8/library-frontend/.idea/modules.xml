@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../library-backend/.idea/library-backend.iml" filepath="$PROJECT_DIR$/../library-backend/.idea/library-backend.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/library-frontend.iml" filepath="$PROJECT_DIR$/.idea/library-frontend.iml" />
     </modules>
   </component>
