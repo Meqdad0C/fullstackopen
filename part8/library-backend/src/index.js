@@ -1,63 +1,77 @@
 const { ApolloServer } = require('@apollo/server')
-const { startStandaloneServer } = require('@apollo/server/standalone')
+const { expressMiddleware } = require('@apollo/server/express4')
+const {
+  ApolloServerPluginDrainHttpServer,
+} = require('@apollo/server/plugin/drainHttpServer')
+const { makeExecutableSchema } = require('@graphql-tools/schema')
+const { WebSocketServer } = require('ws')
+const { useServer } = require('graphql-ws/lib/use/ws')
+const User = require('./models/User')
+const jwt = require('jsonwebtoken')
+const express = require('express')
+const cors = require('cors')
+const http = require('http')
+const mongoDB = require('./utils/mongo')
+const typeDefs = require('./graphql/schema')
+const resolvers = require('./graphql/resolveres')
+const morgan = require('morgan')
+mongoDB()
 
-let persons = [
-  {
-    name: "Arto Hellas",
-    phone: "040-123543",
-    street: "Tapiolankatu 5 A",
-    city: "Espoo",
-    id: "3d594650-3436-11e9-bc57-8b80ba54c431"
-  },
-  {
-    name: "Matti Luukkainen",
-    phone: "040-432342",
-    street: "Malminkaari 10 A",
-    city: "Helsinki",
-    id: '3d599470-3436-11e9-bc57-8b80ba54c431'
-  },
-  {
-    name: "Venla Ruuska",
-    street: "Nallemäentie 22 C",
-    city: "Helsinki",
-    id: '3d599471-3436-11e9-bc57-8b80ba54c431'
-  },
-]
+// setup is now within a function
+const start = async () => {
+  const app = express()
+  const httpServer = http.createServer(app)
 
-const typeDefs = `
-  type Person {
-    name: String!
-    phone: String
-    street: String!
-    city: String! 
-    id: ID!
-  }
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: '/',
+  })
 
-  type Query {
-    personCount: Int!
-    allPersons: [Person!]!
-    findPerson(name: String!): Person
-  }
-`
+  const schema = makeExecutableSchema({ typeDefs, resolvers })
+  const serverCleanup = useServer({ schema }, wsServer)
 
-const resolvers = {
-  Query: {
-    personCount: () => persons.length,
-    allPersons: () => persons,
-    findPerson: (root, args) =>
-      persons.find(p => p.name === args.name)
-  }
+  const server = new ApolloServer({
+    schema,
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await serverCleanup.dispose()
+            },
+          }
+        },
+      },
+    ],
+  })
+
+  await server.start()
+
+  app.use(
+    '/',
+    cors(),
+    express.json(),
+    expressMiddleware(server, {
+      context: async ({ req }) => {
+        const auth = req ? req.headers.authorization : null
+        if (auth && auth.startsWith('Bearer ')) {
+          const decodedToken = jwt.verify(
+            auth.substring(7),
+            process.env.JWT_SECRET
+          )
+          const currentUser = await User.findById(decodedToken.id)
+          return { currentUser }
+        }
+      },
+    })
+  )
+
+  const PORT = 4000
+
+  httpServer.listen(PORT, () =>
+    console.log(`Server is now running on http://localhost:${PORT}`)
+  )
 }
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-})
-
-
-
-startStandaloneServer(server, {
-  listen: { port: 4000 },
-}).then(({ url }) => {
-  console.log(`Server ready at ${url}`)
-})
+start().then(() => console.log('started'))

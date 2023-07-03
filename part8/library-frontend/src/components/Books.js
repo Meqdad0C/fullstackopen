@@ -11,7 +11,7 @@ const Books = () => {
   }, [getBooks])
 
   useEffect(() => {
-    console.log(booksResult.data)
+    console.log(booksResult)
     if (booksResult.data) {
       console.log('setting books')
       setBooks(booksResult.data.allBooks)
