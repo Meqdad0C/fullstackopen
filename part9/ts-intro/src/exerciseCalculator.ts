@@ -14,7 +14,7 @@ interface ExerciseCalculatorResult {
 }
 
 const parseExerciseCalculatorArguments = (
-  args: String[]
+  args: string[]
 ): ExerciseCalculatorValues => {
   if (args.length < 4) throw new Error("Not enough arguments");
   const target = args[2];
@@ -23,7 +23,7 @@ const parseExerciseCalculatorArguments = (
     if (isNaN(Number(d))) {
       throw new Error("Provided values were not numbers!");
     }
-  })
+  });
   if (!isNaN(Number(target))) {
     return {
       target: Number(target),
@@ -35,8 +35,8 @@ const parseExerciseCalculatorArguments = (
 };
 
 export const calculateExercises = (
-  daily_exercises: number[],
-  target: number
+  target: number,
+  daily_exercises: number[]
 ): ExerciseCalculatorResult => {
   const periodLength = daily_exercises.length;
   const trainingDays = daily_exercises.filter((d) => d > 0).length;
@@ -64,7 +64,7 @@ try {
   const { target, daily_exercises } = parseExerciseCalculatorArguments(
     process.argv
   );
-  console.log(calculateExercises(daily_exercises, target));
+  console.log(calculateExercises(target, daily_exercises));
 } catch (e: unknown) {
   if (e instanceof Error) {
     console.log("Error, something bad happened, message: ", e.message);
