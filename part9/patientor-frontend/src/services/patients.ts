@@ -8,7 +8,7 @@ const getAll = async () => {
   return data;
 };
 
-const getOne = async (id: string) => {
+const getOne = async (id: string) : Promise<Patient> => {
   const { data } = await axios.get<Patient>(`${apiBaseUrl}/patients/${id}`);
   return data;
 };
