@@ -25,4 +25,17 @@ router.post('/', (req, res) => {
     if (e instanceof Error) res.status(400).send(e.message);
   }
 });
+
+router.post('/:id/entries', (req, res) => {
+  try {
+    const patient: PatientEntry | undefined = patientsService.findById(req.params.id);
+    if (patient) {
+      const newEntry = patientsService.addEntry(req.body, patient);
+      res.json(newEntry);
+    } else res.sendStatus(404);
+  } catch (e) {
+    if (e instanceof Error) res.status(400).send(e.message);
+  }
+});
+
 export default router;
