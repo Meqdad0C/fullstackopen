@@ -73,14 +73,14 @@ const App = () => {
   return (
     <>
       <Notification message={notification} isError={errorFlag.current} />
+      <h2>create new</h2>
+      <DiaryForm handleSubmit={handleSubmit} />
       <h1>Entries</h1>
       <div className="container">
         {diaries.map((diary) => (
           <Entry key={diary.id} diary={diary} />
         ))}
       </div>
-      <h2>create new</h2>
-      <DiaryForm handleSubmit={handleSubmit} />
     </>
   );
 };
