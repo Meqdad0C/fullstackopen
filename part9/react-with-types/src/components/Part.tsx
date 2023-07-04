@@ -30,14 +30,14 @@ const Part = ({ part }: { part: CoursePart }) => {
         </div>
       );
     case "special":
-        return (
-            <div>
-                <h3>{part.name}</h3>
-                <p>Exercises: {part.exerciseCount}</p>
-                <p>Description: {part.description}</p>
-                <p>Requirements: {part.requirements.join(", ")}</p>
-            </div>
-        );
+      return (
+        <div>
+          <h3>{part.name}</h3>
+          <p>Exercises: {part.exerciseCount}</p>
+          <p>Description: {part.description}</p>
+          <p>Requirements: {part.requirements.join(", ")}</p>
+        </div>
+      );
     default:
       return helper.assertNever(part);
   }
