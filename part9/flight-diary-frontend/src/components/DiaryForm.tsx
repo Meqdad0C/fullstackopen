@@ -1,4 +1,4 @@
-import { NewDiaryEntry } from '../types.ts';
+import { NewDiaryEntry, Visibility, Weather } from '../types.ts';
 import { FormEvent, useState } from 'react';
 
 interface DiaryFormProps {
@@ -28,11 +28,36 @@ const useField = (type: string) => {
   };
 };
 
+const isWeather = (param: string): param is Weather => {
+  return Object.values(Weather)
+    .map((v) => v.toString())
+    .includes(param);
+};
+const parseWeather = (weather: string): Weather => {
+  if (!isWeather(weather)) {
+    throw new Error('Incorrect weather: ' + weather);
+  }
+  return weather;
+};
+const isVisibility = (param: string): param is Visibility => {
+  return Object.values(Visibility)
+    .map((v) => v.toString())
+    .includes(param);
+};
+const parseVisibility = (visibility: string): Visibility => {
+  if (!isVisibility(visibility)) {
+    throw new Error('Incorrect visibility: ' + visibility);
+  }
+  return visibility;
+};
+
 const DiaryForm = ({ handleSubmit }: DiaryFormProps) => {
   const { reset: resetDate, data: date } = useField('date');
-  const { reset: resetWeather, data: weather } = useField('text');
-  const { reset: resetVisibility, data: visibility } = useField('text');
+  const { reset: resetWeather, data: weather } = useField('radio');
+  const { reset: resetVisibility, data: visibility } = useField('radio');
   const { reset: resetComment, data: comment } = useField('text');
+  const weatherValues: string[] = Object.values(Weather);
+  const visibilityValues: string[] = Object.values(Visibility);
 
   const resetFields = () => {
     resetDate();
@@ -43,10 +68,13 @@ const DiaryForm = ({ handleSubmit }: DiaryFormProps) => {
 
   const submitForm = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const weatherValue = parseWeather(weather.value);
+    const visibilityValue = parseVisibility(visibility.value);
+
     const diaryToAdd: NewDiaryEntry = {
       date: date.value,
-      weather: weather.value,
-      visibility: visibility.value,
+      weather: weatherValue,
+      visibility: visibilityValue,
       comment: comment.value,
     };
     await handleSubmit(diaryToAdd);
@@ -60,12 +88,22 @@ const DiaryForm = ({ handleSubmit }: DiaryFormProps) => {
         <input {...date} />
       </div>
       <div>
-        weather
-        <input {...weather} />
+        weather:
+        {weatherValues.map((value) => (
+          <label key={value}>
+            <input {...weather} />
+            {value}
+          </label>
+        ))}
       </div>
       <div>
-        visibility
-        <input {...visibility} />
+        visibilit:
+        {visibilityValues.map((value) => (
+          <label key={value}>
+            <input {...visibility} />
+            {value}
+          </label>
+        ))}
       </div>
       <div>
         comment
