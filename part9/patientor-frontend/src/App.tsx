@@ -27,7 +27,6 @@ const App = () => {
     void fetchPatientList();
   }, []);
 
-
   const patientMatcher = useMatch("/patients/:id");
   const patientID = patientMatcher?.params.id;
 
@@ -50,7 +49,14 @@ const App = () => {
           />
           <Route
             path="/patients/:id"
-            element={<PatientView patientId={patientID} diagnoses={diagnoses} />}
+            element={
+              <PatientView
+                patientId={patientID}
+                diagnoses={diagnoses}
+                patients={patients}
+                setPatients={setPatients}
+              />
+            }
           />
         </Routes>
       </Container>

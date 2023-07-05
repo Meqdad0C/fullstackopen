@@ -86,16 +86,20 @@ const isHealthCheckRating = (param: number): param is HealthCheckRating => {
   return Object.values(HealthCheckRating).includes(param);
 };
 
+const isNumber = (param: unknown): param is number => {
+  return typeof param === 'number' || param instanceof Number;
+};
+
 const parseHealthCheckRating = (object: unknown): HealthCheckRating => {
   console.log(typeof object, `line 92`);
-  if (!isString(object) || !isHealthCheckRating(parseInt(object))) {
+  if (!isNumber(object) || !isHealthCheckRating(object)) {
     throw new Error('Incorrect or missing healthCheckRating: ' + object);
   }
-  return parseInt(object) as HealthCheckRating;
+  return object;
 };
 
 const isEntryType = (param: string): boolean => {
-  return Object.values(EntryType).map((t:EntryType)=> t.toString()).includes(param);
+  return Object.values(EntryType).map((t: EntryType) => t.toString()).includes(param);
 };
 
 const isType = (object: unknown): object is EntryType => {
@@ -118,7 +122,7 @@ export const toNewEntry = (object: unknown): EntryWithoutId => {
       'date' in object &&
       'specialist' in object &&
       'type' in object) {
-        
+
       if (!isType(object.type)) throw new Error('Incorrect or missing type: ' + object.type);
       const type: EntryType = object.type;
       console.log(type, `line 129`);
@@ -134,10 +138,12 @@ export const toNewEntry = (object: unknown): EntryWithoutId => {
             type: 'HealthCheck',
             healthCheckRating: parseHealthCheckRating(object.healthCheckRating),
           };
-          if ("diagnosisCodes" in object)
-            healthCheckEntry.diagnosisCodes = parseDiagnosisCodes(object.diagnosisCodes);
+          if ("diagnosisCodes" in object) {
+            healthCheckEntry.diagnosisCodes = parseDiagnosisCodes(object);
+            console.log(object.diagnosisCodes, `line 144`);
+          }
+          console.log(healthCheckEntry, `line 146`);
           return healthCheckEntry;
-
         case 'OccupationalHealthcare':
           if (!('employerName' in object)) {
             throw new Error('Missing employerName');
