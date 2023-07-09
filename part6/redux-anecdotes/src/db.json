@@ -2,12 +2,12 @@
   "anecdotes": [
     {
       "content": "If it hurts, do it more often",
-      "votes": 2,
+      "votes": 8,
       "id": 1
     },
     {
       "content": "Adding manpower to a late software project makes it later!",
-      "votes": 1,
+      "votes": 6,
       "id": 2
     },
     {
@@ -32,7 +32,7 @@
     },
     {
       "content": "Meqdad is the best",
-      "votes": 0,
+      "votes": 1,
       "id": 7
     },
     {
